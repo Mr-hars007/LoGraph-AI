@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: logoph-database
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=logoph
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: logoph-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@database:5432/logoph
+      - AI_SERVICE_URL=http://ai-service:8004
+    depends_on:
+      database:
+        condition: service_healthy
+
+  ai-service:
+    build: ./ai-service
+    container_name: logoph-ai-service
+    ports:
+      - "8004:8004"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@database:5432/logoph
+      - ARTIFACTS_DIR=/app/artifacts
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ai-artifacts:/app/artifacts
+
+  frontend:
+    build: ./frontend
+    container_name: logoph-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+  # Mock Backend 1 + LGCA 1
+  mock-backend-1:
+    build: ./mock-backends/backend-1
+    container_name: mock-backend-1
+    ports:
+      - "8001:8001"
+
+  lgca-1:
+    build: ./lgca
+    container_name: lgca-1
+    environment:
+      - BACKEND_ID=mock-be-1
+      - MOCK_BACKEND_URL=http://mock-backend-1:8001
+      - CENTRAL_BACKEND_URL=http://backend:8000
+      - SANDBOX_URL=http://script-sandbox:8005
+    depends_on:
+      - backend
+      - mock-backend-1
+      - script-sandbox
+
+  # Mock Backend 2 + LGCA 2
+  mock-backend-2:
+    build: ./mock-backends/backend-2
+    container_name: mock-backend-2
+    ports:
+      - "8002:8002"
+
+  lgca-2:
+    build: ./lgca
+    container_name: lgca-2
+    environment:
+      - BACKEND_ID=mock-be-2
+      - MOCK_BACKEND_URL=http://mock-backend-2:8002
+      - CENTRAL_BACKEND_URL=http://backend:8000
+      - SANDBOX_URL=http://script-sandbox:8005
+    depends_on:
+      - backend
+      - mock-backend-2
+      - script-sandbox
+
+  # Mock Backend 3 + LGCA 3
+  mock-backend-3:
+    build: ./mock-backends/backend-3
+    container_name: mock-backend-3
+    ports:
+      - "8003:8003"
+
+  lgca-3:
+    build: ./lgca
+    container_name: lgca-3
+    environment:
+      - BACKEND_ID=mock-be-3
+      - MOCK_BACKEND_URL=http://mock-backend-3:8003
+      - CENTRAL_BACKEND_URL=http://backend:8000
+      - SANDBOX_URL=http://script-sandbox:8005
+    depends_on:
+      - backend
+      - mock-backend-3
+      - script-sandbox
+
+  # Isolated script execution environment
+  script-sandbox:
+    build: ./script-sandbox
+    container_name: script-sandbox
+    ports:
+      - "8005:8005"
+    privileged: false
+    # Enforce CPU & Memory limits for the sandbox container
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 64M
+
+volumes:
+  pgdata:
+  ai-artifacts:

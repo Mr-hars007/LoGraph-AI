@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logoph AI - GNN Remediation Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+        .glow-green { box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+        .glow-yellow { box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); }
+        .glow-red { box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <!-- Top Nav -->
+    <nav class="border-b border-slate-800 bg-slate-900 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="bg-indigo-600 p-2 rounded text-white font-bold">
+                <i class="fa-solid fa-network-wired"></i> LG
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-slate-100 tracking-wide">Logoph AI</h1>
+                <p class="text-xs text-slate-400">GNN Self-Healing Operations Dashboard</p>
+            </div>
+        </div>
+        
+        <!-- ML Model Status Panel -->
+        <div id="active-model-panel" class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 flex items-center space-x-6 text-sm">
+            <div>
+                <span class="text-slate-400 block text-xs">ACTIVE MODEL</span>
+                <span id="model-id-label" class="font-semibold text-indigo-400">Loading...</span>
+            </div>
+            <div>
+                <span class="text-slate-400 block text-xs">MODEL TYPE</span>
+                <span id="model-type-label" class="font-semibold text-slate-300">-</span>
+            </div>
+            <div>
+                <span class="text-slate-400 block text-xs">ACCURACY</span>
+                <span id="model-accuracy-label" class="font-semibold text-green-400">-</span>
+            </div>
+            <div>
+                <span class="text-slate-400 block text-xs">MACRO F1</span>
+                <span id="model-f1-label" class="font-semibold text-green-400">-</span>
+            </div>
+            <button onclick="openTrainModal()" class="bg-indigo-600 hover:bg-indigo-500 text-xs px-3 py-1.5 rounded font-medium transition">
+                <i class="fa-solid fa-graduation-cap mr-1"></i> Retrain
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Grid -->
+    <main class="p-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
+        
+        <!-- LEFT COLUMN: Graph Visualization & Real-time Charts -->
+        <div class="xl:col-span-2 space-y-6">
+            
+            <!-- Graph Visualization Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold tracking-wide text-slate-200">
+                        <i class="fa-solid fa-chart-network mr-2 text-indigo-500"></i> GNN Graph Snapshot
+                    </h2>
+                    <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded">Topology: Triangle Loop</span>
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-center justify-around bg-slate-950 rounded-lg p-4 border border-slate-900">
+                    <!-- HTML5 Canvas for Graph -->
+                    <div class="relative">
+                        <canvas id="gnnCanvas" width="340" height="260" class="mx-auto"></canvas>
+                        <div class="absolute bottom-2 left-2 text-xs text-slate-500">
+                            Edges represent dynamic inter-service correlations
+                        </div>
+                    </div>
+                    
+                    <!-- Graph Legend / Details -->
+                    <div class="mt-4 md:mt-0 space-y-3 w-full md:w-64">
+                        <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Node Statuses</h3>
+                        <div id="node-status-list" class="space-y-2">
+                            <!-- JS filled -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time Series Charts Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <h2 class="text-lg font-semibold tracking-wide text-slate-200 mb-4">
+                    <i class="fa-solid fa-chart-line mr-2 text-indigo-500"></i> Real-time Telemetry Metrics (CPU & Latency)
+                </h2>
+                <div class="h-64">
+                    <canvas id="telemetryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Simulation & Telemetry Cards -->
+        <div class="space-y-6">
+            
+            <!-- Demo Attack Simulation Panel -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-red-400">
+                        <i class="fa-solid fa-circle-radiation mr-2"></i> Demo Attack Simulation
+                    </h2>
+                    <span class="text-xs bg-red-950/50 border border-red-900/50 text-red-400 px-2 py-0.5 rounded font-mono">SANDBOXED</span>
+                </div>
+                <p class="text-sm text-slate-400 mb-4">
+                    Simulate artificial workload pressure to trigger degradation. The system is strictly bounded locally.
+                </p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Target Service</label>
+                        <select id="sim-target" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none focus:border-indigo-500">
+                            <option value="mock-be-1">Mock Backend 1 (BE1)</option>
+                            <option value="mock-be-2">Mock Backend 2 (BE2)</option>
+                            <option value="mock-be-3">Mock Backend 3 (BE3)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Duration</label>
+                            <select id="sim-duration" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
+                                <option value="15">15 Seconds</option>
+                                <option value="30">30 Seconds</option>
+                                <option value="45">45 Seconds</option>
+                                <option value="60">60 Seconds</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Intensity</label>
+                            <select id="sim-intensity" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
+                                <option value="low">Low (+50% CPU)</option>
+                                <option value="medium">Medium (+75% CPU)</option>
+                                <option value="high">High (+90% CPU/Lat)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <button onclick="startSimulation()" class="bg-red-600 hover:bg-red-500 text-white py-2 px-4 rounded font-semibold transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-play"></i> <span>Start Stress</span>
+                        </button>
+                        <button onclick="stopSimulation()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 py-2 px-4 rounded font-semibold transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-stop"></i> <span>Stop / Recover</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Telemetry Cards for the 3 Backends -->
+            <div class="space-y-4">
+                <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Live Backend Telemetry</h3>
+                
+                <div id="backend-cards-container" class="space-y-3">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Section: Script and Rules Management, Action Logs -->
+    <section class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 border-t border-slate-800 mt-6 bg-slate-950/40">
+        
+        <!-- Column 1: Scripts Management -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-slate-200">
+                    <i class="fa-solid fa-file-code mr-2 text-indigo-500"></i> Remediation Scripts
+                </h2>
+                <button onclick="openScriptModal()" class="text-xs bg-indigo-600 hover:bg-indigo-500 px-2 py-1 rounded">
+                    <i class="fa-solid fa-plus mr-1"></i> Create
+                </button>
+            </div>
+            <div id="scripts-list" class="space-y-3 overflow-y-auto max-h-64 pr-2">
+                <!-- JS Filled -->
+            </div>
+        </div>
+
+        <!-- Column 2: Decision Rules Config -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-slate-200">
+                    <i class="fa-solid fa-sliders mr-2 text-indigo-500"></i> Automation Rules
+                </h2>
+                <button onclick="openRuleModal()" class="text-xs bg-indigo-600 hover:bg-indigo-500 px-2 py-1 rounded">
+                    <i class="fa-solid fa-plus mr-1"></i> Create
+                </button>
+            </div>
+            <div id="rules-list" class="space-y-3 overflow-y-auto max-h-64 pr-2">
+                <!-- JS Filled -->
+            </div>
+        </div>
+
+        <!-- Column 3: Action Logs Timeline -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+            <h2 class="text-lg font-semibold text-slate-200 mb-4">
+                <i class="fa-solid fa-clock-rotate-left mr-2 text-indigo-500"></i> Execution Timeline
+            </h2>
+            <div id="actions-timeline" class="space-y-3 overflow-y-auto max-h-64 pr-2">
+                <!-- JS Filled -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Modals -->
+    <!-- Script Creation Modal -->
+    <div id="scriptModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-xl w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-semibold text-slate-200" id="script-modal-title">Create Remediation Script</h3>
+                <button onclick="closeScriptModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <form id="script-form" class="space-y-4" onsubmit="saveScript(event)">
+                <input type="hidden" id="script-id-input">
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Name</label>
+                    <input type="text" id="script-name" required class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Description</label>
+                    <input type="text" id="script-desc" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Target Backend</label>
+                        <select id="script-backend" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
+                            <option value="mock-be-1">Mock Backend 1</option>
+                            <option value="mock-be-2">Mock Backend 2</option>
+                            <option value="mock-be-3">Mock Backend 3</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center pt-5">
+                        <input type="checkbox" id="script-enabled" checked class="h-4 w-4 rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-indigo-500">
+                        <label for="script-enabled" class="ml-2 text-sm text-slate-300">Enabled</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Python Script (Runs in Sandbox)</label>
+                    <textarea id="script-content" required rows="6" class="w-full bg-slate-950 border border-slate-800 rounded p-3 font-mono text-xs text-green-400 focus:outline-none focus:border-indigo-500"></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeScriptModal()" class="px-4 py-2 rounded bg-slate-800 hover:bg-slate-700 text-sm font-medium transition">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-500 text-sm font-medium transition">Save Script</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rule Creation Modal -->
+    <div id="ruleModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-semibold text-slate-200" id="rule-modal-title">Create Automation Rule</h3>
+                <button onclick="closeRuleModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <form id="rule-form" class="space-y-4" onsubmit="saveRule(event)">
+                <input type="hidden" id="rule-id-input">
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Prediction Match</label>
+                    <select id="rule-prediction" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
+                        <option value="HIGH_LOAD">HIGH_LOAD</option>
+                        <option value="DEGRADED">DEGRADED</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Minimum Confidence Score</label>
+                    <input type="number" step="0.01" min="0.0" max="1.0" id="rule-score" value="0.85" required class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Target Backend</label>
+                    <select id="rule-backend" onchange="updateRuleScriptOptions()" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
+                        <option value="mock-be-1">Mock Backend 1</option>
+                        <option value="mock-be-2">Mock Backend 2</option>
+                        <option value="mock-be-3">Mock Backend 3</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Trigger Remediation Script</label>
+                    <select id="rule-script" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
+                        <!-- Filled by JS -->
+                    </select>
+                </div>
+                <div class="flex items-center pt-2">
+                    <input type="checkbox" id="rule-enabled" checked class="h-4 w-4 rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-indigo-500">
+                    <label for="rule-enabled" class="ml-2 text-sm text-slate-300">Enabled</label>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeRuleModal()" class="px-4 py-2 rounded bg-slate-800 hover:bg-slate-700 text-sm font-medium transition">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-500 text-sm font-medium transition">Save Rule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Retrain Model Modal -->
+    <div id="trainModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-sm w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-semibold text-slate-200">Retrain ML Model Pipeline</h3>
+                <button onclick="closeTrainModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Model Architecture</label>
+                    <select id="train-model-type" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
+                        <option value="gnn">Graph Neural Network (GNN)</option>
+                        <option value="conv">Convolutional Temporal Model (Conv)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Training Epochs</label>
+                    <input type="number" id="train-epochs" value="30" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeTrainModal()" class="px-4 py-2 rounded bg-slate-800 hover:bg-slate-700 text-sm transition">Cancel</button>
+                    <button onclick="triggerTraining()" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold transition">Start Training</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts Logic -->
+    <script>
+        const API_URL = ""; // Relative url since it runs on the same domain or proxied.
+        
+        let loadedScripts = [];
+        let loadedRules = [];
+        let latestTelemetry = [];
+        let telemetryHistory = [];
+        let currentModels = [];
+        
+        // Chart configuration
+        let chartInstance = null;
+        
+        // Canvas config
+        const canvas = document.getElementById("gnnCanvas");
+        const ctx = canvas.getContext("2d");
+        
+        // Define node positions
+        const nodes = {
+            "mock-be-1": { x: 170, y: 60, name: "BE1", color: "#22c55e", state: "NORMAL", score: 0.95 },
+            "mock-be-2": { x: 270, y: 190, name: "BE2", color: "#22c55e", state: "NORMAL", score: 0.95 },
+            "mock-be-3": { x: 70, y: 190, name: "BE3", color: "#22c55e", state: "NORMAL", score: 0.95 }
+        };
+
+        // Initialize dashboard
+        window.addEventListener("DOMContentLoaded", () => {
+            initChart();
+            drawGraph();
+            
+            // Poll data
+            fetchData();
+            setInterval(fetchData, 1000);
+        });
+
+        function fetchData() {
+            // Latest telemetry
+            fetch("/api/telemetry/latest")
+                .then(res => res.json())
+                .then(data => {
+                    latestTelemetry = data;
+                    updateDashboardCards();
+                    updateGraphState();
+                }).catch(err => console.error("Error fetching latest telemetry:", err));
+                
+            // Telemetry history (for chart)
+            fetch("/api/telemetry/history?limit=15")
+                .then(res => res.json())
+                .then(data => {
+                    telemetryHistory = data;
+                    updateChartData();
+                }).catch(err => console.error("Error fetching telemetry history:", err));
+
+            // Actions logs
+            fetch("/api/actions")
+                .then(res => res.json())
+                .then(data => {
+                    updateActionsTimeline(data);
+                }).catch(err => console.error("Error fetching actions:", err));
+
+            // Model status
+            fetch("/api/models")
+                .then(res => res.json())
+                .then(data => {
+                    currentModels = data;
+                    updateModelMeta();
+                }).catch(err => console.error("Error fetching models:", err));
+                
+            // Scripts and Rules (can be loaded less frequently but simple polling is fine for MVP)
+            fetchScripts();
+            fetchRules();
+        }
+
+        function fetchScripts() {
+            fetch("/api/scripts")
+                .then(res => res.json())
+                .then(data => {
+                    loadedScripts = data;
+                    renderScripts();
+                }).catch(err => console.error("Error fetching scripts:", err));
+        }
+
+        function fetchRules() {
+            fetch("/api/rules")
+                .then(res => res.json())
+                .then(data => {
+                    loadedRules = data;
+                    renderRules();
+                }).catch(err => console.error("Error fetching rules:", err));
+        }
+
+        function updateDashboardCards() {
+            const container = document.getElementById("backend-cards-container");
+            container.innerHTML = "";
+            
+            latestTelemetry.forEach(be => {
+                const isNormal = be.health_status === "NORMAL";
+                const isDegraded = be.health_status === "DEGRADED" && be.cpu < 75.0;
+                const isHighLoad = be.health_status === "DEGRADED" && be.cpu >= 75.0;
+                
+                let stateLabel = "NORMAL";
+                let badgeColor = "bg-green-500/20 text-green-400 border-green-500/30";
+                
+                if (isHighLoad) {
+                    stateLabel = "HIGH_LOAD";
+                    badgeColor = "bg-red-500/20 text-red-400 border-red-500/30";
+                } else if (isDegraded) {
+                    stateLabel = "DEGRADED";
+                    badgeColor = "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+                }
+
+                const cardHtml = `
+                    <div class="bg-slate-950 border border-slate-800 rounded-lg p-4 transition duration-200 hover:border-slate-700">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-bold text-slate-200">${be.backend_id.toUpperCase()}</span>
+                            <span class="px-2 py-0.5 border rounded text-xs font-mono font-bold ${badgeColor}">${stateLabel}</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                            <div class="flex justify-between border-b border-slate-900 pb-1">
+                                <span class="text-slate-400">CPU</span>
+                                <span class="font-mono text-slate-200 font-bold">${be.cpu}%</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-900 pb-1">
+                                <span class="text-slate-400">Memory</span>
+                                <span class="font-mono text-slate-200">${be.memory}%</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-900 pb-1">
+                                <span class="text-slate-400">Latency</span>
+                                <span class="font-mono text-slate-200">${be.latency}ms</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-900 pb-1">
+                                <span class="text-slate-400">Errors</span>
+                                <span class="font-mono text-slate-200">${be.error_rate}%</span>
+                            </div>
+                            <div class="flex justify-between pb-1 col-span-2">
+                                <span class="text-slate-400">Active Requests (Queue)</span>
+                                <span class="font-mono text-slate-200">${be.active_requests} (${be.queue_depth})</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        function updateGraphState() {
+            // Update node colors and states based on telemetry
+            latestTelemetry.forEach(be => {
+                const node = nodes[be.backend_id];
+                if (node) {
+                    const isHighLoad = be.health_status === "DEGRADED" && be.cpu >= 75.0;
+                    const isDegraded = be.health_status === "DEGRADED" && be.cpu < 75.0;
+                    
+                    if (isHighLoad) {
+                        node.state = "HIGH_LOAD";
+                        node.color = "#ef4444";
+                    } else if (isDegraded) {
+                        node.state = "DEGRADED";
+                        node.color = "#eab308";
+                    } else {
+                        node.state = "NORMAL";
+                        node.color = "#22c55e";
+                    }
+                }
+            });
+            
+            // Draw list
+            const list = document.getElementById("node-status-list");
+            list.innerHTML = "";
+            
+            Object.keys(nodes).forEach(key => {
+                const n = nodes[key];
+                let colorClass = "text-green-400";
+                if (n.state === "HIGH_LOAD") colorClass = "text-red-400";
+                else if (n.state === "DEGRADED") colorClass = "text-yellow-400";
+                
+                list.innerHTML += `
+                    <div class="flex items-center justify-between text-xs bg-slate-900/60 p-2 rounded border border-slate-800/50">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${n.color};"></span>
+                            <span class="font-semibold text-slate-300">${key.toUpperCase()}</span>
+                        </div>
+                        <span class="font-mono font-bold ${colorClass}">${n.state}</span>
+                    </div>
+                `;
+            });
+            
+            drawGraph();
+        }
+
+        function drawGraph() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid lines on background
+            ctx.strokeStyle = "#1e293b";
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let j = 0; j < canvas.height; j += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, j);
+                ctx.lineTo(canvas.width, j);
+                ctx.stroke();
+            }
+            
+            // Draw edges
+            ctx.strokeStyle = "#4f46e5";
+            ctx.lineWidth = 3;
+            
+            const nodeKeys = Object.keys(nodes);
+            
+            // Draw edges in cyclic triangle loop
+            for (let i = 0; i < nodeKeys.length; i++) {
+                const n1 = nodes[nodeKeys[i]];
+                const n2 = nodes[nodeKeys[(i + 1) % nodeKeys.length]];
+                
+                ctx.beginPath();
+                ctx.moveTo(n1.x, n1.y);
+                ctx.lineTo(n2.x, n2.y);
+                ctx.stroke();
+            }
+            
+            // Draw nodes
+            nodeKeys.forEach(key => {
+                const node = nodes[key];
+                
+                // Draw Outer glow
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 25, 0, 2 * Math.PI);
+                ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+                ctx.fill();
+                
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = node.color;
+                ctx.stroke();
+                
+                // Draw Inner point
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI);
+                ctx.fillStyle = node.color;
+                ctx.fill();
+                
+                // Node text
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 11px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText(node.name, node.x, node.y - 32);
+                
+                // State text below node
+                ctx.fillStyle = node.color;
+                ctx.font = "bold 9px monospace";
+                ctx.fillText(node.state, node.x, node.y + 36);
+            });
+        }
+
+        function initChart() {
+            const telemetryCtx = document.getElementById("telemetryChart").getContext("2d");
+            chartInstance = new Chart(telemetryCtx, {
+                type: "line",
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: "BE1 CPU (%)",
+                            borderColor: "#ef4444",
+                            backgroundColor: "rgba(239, 68, 68, 0.1)",
+                            data: [],
+                            tension: 0.3,
+                            borderWidth: 2,
+                            pointRadius: 0
+                        },
+                        {
+                            label: "BE2 CPU (%)",
+                            borderColor: "#eab308",
+                            backgroundColor: "rgba(234, 179, 8, 0.1)",
+                            data: [],
+                            tension: 0.3,
+                            borderWidth: 2,
+                            pointRadius: 0
+                        },
+                        {
+                            label: "BE3 CPU (%)",
+                            borderColor: "#22c55e",
+                            backgroundColor: "rgba(34, 197, 94, 0.1)",
+                            data: [],
+                            tension: 0.3,
+                            borderWidth: 2,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: "#1e293b" },
+                            ticks: { display: false }
+                        },
+                        y: {
+                            min: 0,
+                            max: 100,
+                            grid: { color: "#1e293b" },
+                            ticks: { color: "#94a3b8" }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: "#f1f5f9", boxWidth: 12, font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function updateChartData() {
+            if (!chartInstance || telemetryHistory.length === 0) return;
+            
+            // Format labels (timestamps) and match data arrays
+            const sorted = [...telemetryHistory].sort((a, b) => a.timestamp - b.timestamp);
+            
+            // Group by rounded timestamp
+            const groups = {};
+            sorted.forEach(row => {
+                const sec = Math.round(row.timestamp);
+                if (!groups[sec]) groups[sec] = {};
+                groups[sec][row.backend_id] = row.cpu;
+            });
+            
+            const timeLabels = Object.keys(groups).sort();
+            const be1_data = [];
+            const be2_data = [];
+            const be3_data = [];
+            
+            timeLabels.forEach(t => {
+                be1_data.push(groups[t]["mock-be-1"] || null);
+                be2_data.push(groups[t]["mock-be-2"] || null);
+                be3_data.push(groups[t]["mock-be-3"] || null);
+            });
+            
+            chartInstance.data.labels = timeLabels.map(t => new Date(t * 1000).toLocaleTimeString());
+            chartInstance.data.datasets[0].data = be1_data;
+            chartInstance.data.datasets[1].data = be2_data;
+            chartInstance.data.datasets[2].data = be3_data;
+            
+            chartInstance.update("none"); // Update silently
+        }
+
+        function updateModelMeta() {
+            const active = currentModels.find(m => m.active === true);
+            if (active) {
+                document.getElementById("model-id-label").innerText = active.model_id;
+                document.getElementById("model-type-label").innerText = active.model_type.toUpperCase();
+                
+                try {
+                    const metrics = JSON.parse(active.metrics);
+                    document.getElementById("model-accuracy-label").innerText = (metrics.accuracy * 100).toFixed(1) + "%";
+                    document.getElementById("model-f1-label").innerText = (metrics.macro_f1 * 100).toFixed(1) + "%";
+                } catch (e) {
+                    document.getElementById("model-accuracy-label").innerText = "Error";
+                    document.getElementById("model-f1-label").innerText = "-";
+                }
+            } else {
+                document.getElementById("model-id-label").innerText = "No Model Active";
+                document.getElementById("model-type-label").innerText = "FALLBACK";
+                document.getElementById("model-accuracy-label").innerText = "N/A";
+                document.getElementById("model-f1-label").innerText = "N/A";
+            }
+        }
+
+        function updateActionsTimeline(actions) {
+            const container = document.getElementById("actions-timeline");
+            container.innerHTML = "";
+            
+            if (actions.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 italic p-4 text-center">No remediation actions executed yet.</p>`;
+                return;
+            }
+            
+            actions.forEach(act => {
+                let statusColor = "text-slate-400 bg-slate-800";
+                if (act.status === "SUCCESS") statusColor = "text-green-400 bg-green-950/40 border-green-900";
+                else if (act.status === "FAILED") statusColor = "text-red-400 bg-red-950/40 border-red-900";
+                else if (act.status === "EXECUTING") statusColor = "text-yellow-400 bg-yellow-950/40 border-yellow-900 border animate-pulse";
+                else if (act.status === "QUEUED") statusColor = "text-indigo-400 bg-indigo-950/40 border-indigo-900";
+                
+                const timeString = new Date(act.timestamp * 1000).toLocaleTimeString();
+                
+                const outSection = act.output ? `<pre class="mt-1.5 p-1.5 bg-black/60 rounded text-[10px] text-green-400 font-mono overflow-x-auto max-h-16">${act.output}</pre>` : "";
+                const errSection = act.error ? `<pre class="mt-1.5 p-1.5 bg-red-950/40 rounded text-[10px] text-red-400 font-mono overflow-x-auto max-h-16">${act.error}</pre>` : "";
+
+                const row = `
+                    <div class="p-3 bg-slate-950 border border-slate-900 rounded-lg text-xs space-y-1.5">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-300">${act.script_name || act.script_id}</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${statusColor}">${act.status}</span>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-500">
+                            <span>Target: <b class="text-slate-400">${act.backend_id}</b></span>
+                            <span>Time: ${timeString}</span>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-500 border-t border-slate-900 pt-1">
+                            <span>Trigger: <b>${act.prediction} (${(act.score * 100).toFixed(0)}%)</b></span>
+                        </div>
+                        ${outSection}
+                        ${errSection}
+                    </div>
+                `;
+                container.innerHTML += row;
+            });
+        }
+
+        // Script list render
+        function renderScripts() {
+            const container = document.getElementById("scripts-list");
+            container.innerHTML = "";
+            
+            loadedScripts.forEach(s => {
+                container.innerHTML += `
+                    <div class="bg-slate-950 border border-slate-800/80 rounded-lg p-3 text-xs flex justify-between items-center hover:border-slate-700 transition">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-bold text-slate-200">${s.name}</span>
+                                <span class="text-[9px] bg-slate-800 px-1 py-0.5 rounded text-slate-400">v${s.version}</span>
+                            </div>
+                            <p class="text-slate-500 text-[10px] mt-0.5">${s.description || 'No description'}</p>
+                            <span class="text-[10px] text-indigo-400 font-mono">Targets: ${s.target_backend}</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editScript('${s.script_id}')" class="text-indigo-400 hover:text-indigo-300 p-1.5"><i class="fa-solid fa-pen-to-square"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Rules list render
+        function renderRules() {
+            const container = document.getElementById("rules-list");
+            container.innerHTML = "";
+            
+            loadedRules.forEach(r => {
+                const statusIcon = r.enabled ? '<i class="fa-solid fa-toggle-on text-indigo-500 text-lg"></i>' : '<i class="fa-solid fa-toggle-off text-slate-600 text-lg"></i>';
+                container.innerHTML += `
+                    <div class="bg-slate-950 border border-slate-800/80 rounded-lg p-3 text-xs flex justify-between items-center">
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-2">
+                                <span class="font-semibold text-slate-200">If: ${r.prediction}</span>
+                                <span class="text-[10px] text-slate-500">(conf >= ${r.minimum_score})</span>
+                            </div>
+                            <div class="text-[10px] text-slate-400">Target: <span class="text-slate-300 font-bold">${r.target_backend}</span></div>
+                            <div class="text-[10px] text-indigo-400">Trigger: ${r.script_name || r.script_id}</div>
+                        </div>
+                        <button onclick="toggleRule(${r.id})" class="focus:outline-none p-1">${statusIcon}</button>
+                    </div>
+                `;
+            });
+        }
+
+        // Demo Actions
+        function startSimulation() {
+            const backend_id = document.getElementById("sim-target").value;
+            const duration = parseInt(document.getElementById("sim-duration").value);
+            const intensity = document.getElementById("sim-intensity").value;
+            
+            fetch("/api/demo/stress", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ backend_id, duration, intensity })
+            })
+            .then(res => res.json())
+            .then(data => alert(`Stressed ${backend_id} (${intensity}) successfully.`))
+            .catch(err => alert("Failed to trigger stress: " + err));
+        }
+
+        function stopSimulation() {
+            const backend_id = document.getElementById("sim-target").value;
+            fetch("/api/demo/recover", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ backend_id })
+            })
+            .then(res => res.json())
+            .then(data => alert(`Triggered recovery request for ${backend_id}`))
+            .catch(err => alert("Failed to recover: " + err));
+        }
+
+        // Modal triggers
+        function openScriptModal() {
+            document.getElementById("script-modal-title").innerText = "Create Remediation Script";
+            document.getElementById("script-id-input").value = "";
+            document.getElementById("script-name").value = "";
+            document.getElementById("script-desc").value = "";
+            document.getElementById("script-content").value = `# Write python sandbox script here
+import urllib.request
+import os
+
+backend_url = os.environ.get("MOCK_BACKEND_URL")
+# Complete recovery trigger
+req = urllib.request.Request(f"{backend_url}/recover", method="POST")
+urllib.request.urlopen(req)
+print("Recovery completed successfully.")`;
+            document.getElementById("scriptModal").classList.remove("hidden");
+            document.getElementById("scriptModal").classList.add("flex");
+        }
+
+        function editScript(script_id) {
+            const s = loadedScripts.find(x => x.script_id === script_id);
+            if (!s) return;
+            
+            document.getElementById("script-modal-title").innerText = "Edit Remediation Script";
+            document.getElementById("script-id-input").value = s.script_id;
+            document.getElementById("script-name").value = s.name;
+            document.getElementById("script-desc").value = s.description;
+            document.getElementById("script-backend").value = s.target_backend;
+            document.getElementById("script-content").value = s.content;
+            document.getElementById("script-enabled").checked = s.enabled;
+            
+            document.getElementById("scriptModal").classList.remove("hidden");
+            document.getElementById("scriptModal").classList.add("flex");
+        }
+
+        function closeScriptModal() {
+            document.getElementById("scriptModal").classList.add("hidden");
+            document.getElementById("scriptModal").classList.remove("flex");
+        }
+
+        function saveScript(event) {
+            event.preventDefault();
+            const script_id = document.getElementById("script-id-input").value;
+            const name = document.getElementById("script-name").value;
+            const description = document.getElementById("script-desc").value;
+            const target_backend = document.getElementById("script-backend").value;
+            const content = document.getElementById("script-content").value;
+            const enabled = document.getElementById("script-enabled").checked;
+            
+            const payload = { name, description, target_backend, content, enabled };
+            
+            const method = script_id ? "PUT" : "POST";
+            const url = script_id ? `/api/scripts/${script_id}` : "/api/scripts";
+            
+            fetch(url, {
+                method: method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(() => {
+                closeScriptModal();
+                fetchScripts();
+            })
+            .catch(err => alert("Error saving script: " + err));
+        }
+
+        function openRuleModal() {
+            document.getElementById("ruleModal").classList.remove("hidden");
+            document.getElementById("ruleModal").classList.add("flex");
+            updateRuleScriptOptions();
+        }
+
+        function closeRuleModal() {
+            document.getElementById("ruleModal").classList.add("hidden");
+            document.getElementById("ruleModal").classList.remove("flex");
+        }
+
+        function updateRuleScriptOptions() {
+            const targetBe = document.getElementById("rule-backend").value;
+            const scriptSelect = document.getElementById("rule-script");
+            scriptSelect.innerHTML = "";
+            
+            // Filter scripts for that backend
+            const filtered = loadedScripts.filter(s => s.target_backend === targetBe);
+            if (filtered.length === 0) {
+                scriptSelect.innerHTML = `<option value="">No scripts matching this backend</option>`;
+            } else {
+                filtered.forEach(s => {
+                    scriptSelect.innerHTML += `<option value="${s.script_id}">${s.name}</option>`;
+                });
+            }
+        }
+
+        function saveRule(event) {
+            event.preventDefault();
+            const prediction = document.getElementById("rule-prediction").value;
+            const minimum_score = parseFloat(document.getElementById("rule-score").value);
+            const target_backend = document.getElementById("rule-backend").value;
+            const script_id = document.getElementById("rule-script").value;
+            const enabled = document.getElementById("rule-enabled").checked;
+            
+            if (!script_id) {
+                alert("Please select a script");
+                return;
+            }
+            
+            fetch("/api/rules", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prediction, minimum_score, target_backend, script_id, enabled })
+            })
+            .then(res => res.json())
+            .then(() => {
+                closeRuleModal();
+                fetchRules();
+            })
+            .catch(err => alert("Error saving rule: " + err));
+        }
+
+        function toggleRule(rule_id) {
+            const r = loadedRules.find(x => x.id === rule_id);
+            if (!r) return;
+            
+            fetch(`/api/rules/${r.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    prediction: r.prediction,
+                    minimum_score: r.minimum_score,
+                    target_backend: r.target_backend,
+                    script_id: r.script_id,
+                    enabled: !r.enabled
+                })
+            })
+            .then(res => res.json())
+            .then(() => fetchRules())
+            .catch(err => alert("Failed to toggle rule: " + err));
+        }
+
+        function openTrainModal() {
+            document.getElementById("trainModal").classList.remove("hidden");
+            document.getElementById("trainModal").classList.add("flex");
+        }
+
+        function closeTrainModal() {
+            document.getElementById("trainModal").classList.add("hidden");
+            document.getElementById("trainModal").classList.remove("flex");
+        }
+
+        function triggerTraining() {
+            const model_type = document.getElementById("train-model-type").value;
+            const epochs = parseInt(document.getElementById("train-epochs").value);
+            
+            fetch("/api/train", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ model_type, epochs })
+            })
+            .then(res => res.json())
+            .then(() => {
+                closeTrainModal();
+                alert("Training job triggered in background! Visual metrics will update when complete.");
+            })
+            .catch(err => alert("Failed to trigger training: " + err));
+        }
+    </script>
+</body>
+</html>
