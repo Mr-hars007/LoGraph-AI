@@ -1,0 +1,36 @@
+{
+  "telemetry": {
+    "mode": "jsonl",
+    "endpoint": "http://127.0.0.1:4318/v1/logs",
+    "jsonl_path": "data/otel_logs.jsonl",
+    "poll_seconds": 30,
+    "lookback_seconds": 600
+  },
+  "training": {
+    "negative_ratio": 1,
+    "epochs": 500,
+    "learning_rate": 0.05,
+    "message_passing_steps": 2,
+    "embedding_size": 4,
+    "anomaly_threshold": 0.25
+  },
+  "actions": [
+    {
+      "name": "gui-action",
+      "when": {
+        "type": "low_link_probability",
+        "threshold": 0.25
+      },
+      "exec": {
+        "command": "python",
+        "args": [
+          "scripts/handle_incident.py",
+          "{source}",
+          "{target}",
+          "{probability}"
+        ],
+        "timeout_seconds": 20
+      }
+    }
+  ]
+}

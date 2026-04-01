@@ -51,3 +51,36 @@ UI-compatible training:
 	- Train Model button runs the trainer directly from UI
 	- RPC map input supports comma-separated files for training
 	- Training metrics and model save path are shown in the UI panel
+
+Deploy-and-use automation tool:
+- Files:
+	- lograph.py (single entry command)
+	- lograph_tool/cli.py
+	- lograph_tool/gui.py
+	- lograph_tool/otel_ingest.py
+	- lograph_tool/graph_model.py
+	- lograph_tool/automation.py
+
+Tool workflow:
+- Fetch telemetry logs from OpenTelemetry HTTP endpoint or JSONL stream
+- Build service graph snapshot from logs
+- Train a message-passing GNN-style link model automatically
+- Detect low-probability links as triggers
+- Execute configured programs with dynamic parameters
+
+Quickstart:
+- Initialize config:
+	- python lograph.py init
+- One-shot run:
+	- python lograph.py run
+- Continuous monitor:
+	- python lograph.py monitor
+- Open GUI control panel:
+	- python lograph.py gui
+
+Default config file:
+- lograph-tool.json
+	- telemetry.mode: jsonl or http
+	- telemetry.endpoint: OTel logs endpoint for mode=http
+	- telemetry.jsonl_path: local stream file for mode=jsonl
+	- actions: trigger rules and executable commands

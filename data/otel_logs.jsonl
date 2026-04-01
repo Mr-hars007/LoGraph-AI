@@ -1,0 +1,8 @@
+{"timestamp": 1775026141, "source": "nginx-thrift", "target": "compose-post-service"}
+{"timestamp": 1775026142, "source": "compose-post-service", "target": "compose-post-redis"}
+{"timestamp": 1775026143, "source": "compose-post-service", "target": "post-storage-service"}
+{"timestamp": 1775026144, "source": "post-storage-service", "target": "post-storage-mongodb"}
+{"timestamp": 1775026145, "source": "user-timeline-service", "target": "user-timeline-redis"}
+{"timestamp": 1775026146, "source": "user-timeline-service", "target": "post-storage-service"}
+{"timestamp": 1775026147, "source": "social-graph-service", "target": "social-graph-redis"}
+{"timestamp": 1775026148, "source": "social-graph-service", "target": "social-graph-mongodb"}
