@@ -1,3 +1,6 @@
+// Orders history and status timeline page.
+// Displays live or fallback demo orders with per-order detail views.
+
 import { useState, useEffect } from "react";
 import { useApp } from "./App";
 import { orderApi } from "./api";

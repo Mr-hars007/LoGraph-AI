@@ -1,3 +1,6 @@
+// Product listing and discovery page.
+// Supports category/search filtering and add-to-cart interactions.
+
 import { useState } from "react";
 import { useApp, PRODUCTS } from "./App";
 

@@ -1,3 +1,6 @@
+// Checkout workflow for address, payment, and confirmation.
+// Creates orders and triggers payment processing via API clients.
+
 import { useState } from "react";
 import { useApp } from "./App";
 import { orderApi, paymentApi } from "./api";

@@ -1,3 +1,5 @@
+"""Baseline trainer for lightweight link prediction on prepared graph data."""
+
 from __future__ import annotations
 
 import csv

@@ -1,3 +1,8 @@
+"""Builds GNN-ready tensors and metadata from RPC and metrics inputs.
+
+This module is the primary data preparation step used by training and UI paths.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

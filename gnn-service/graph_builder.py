@@ -1,3 +1,5 @@
+"""Utilities for loading RPC maps and constructing a weighted service graph."""
+
 from __future__ import annotations
 
 import csv

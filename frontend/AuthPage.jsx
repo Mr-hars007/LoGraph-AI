@@ -1,3 +1,6 @@
+// Authentication page for login and registration.
+// Integrates with user service endpoints and updates shared app session state.
+
 import { useState } from "react";
 import { useApp } from "./App";
 import { userApi } from "./api";

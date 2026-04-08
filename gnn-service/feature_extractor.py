@@ -1,3 +1,5 @@
+"""Loads CPU metric streams and derives per-service feature vectors."""
+
 from __future__ import annotations
 
 import json

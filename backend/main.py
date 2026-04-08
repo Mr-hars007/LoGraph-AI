@@ -1,3 +1,8 @@
+"""FastAPI backend for graph preview, upload, and pipeline integration.
+
+Provides endpoints used by the web UI and local testing workflows.
+"""
+
 from pathlib import Path
 import sys
 

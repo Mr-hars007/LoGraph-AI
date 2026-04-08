@@ -1,10 +1,13 @@
 {
+  "setup": {
+    "completed": true
+  },
   "telemetry": {
     "mode": "jsonl",
-    "endpoint": "http://127.0.0.1:4318/v1/logs",
+    "endpoint": "",
     "jsonl_path": "data/otel_logs.jsonl",
     "poll_seconds": 30,
-    "lookback_seconds": 600
+    "lookback_seconds": 999999999
   },
   "training": {
     "negative_ratio": 1,
@@ -12,7 +15,8 @@
     "learning_rate": 0.05,
     "message_passing_steps": 2,
     "embedding_size": 4,
-    "anomaly_threshold": 0.25
+    "anomaly_threshold": 0.25,
+    "failure_threshold": 0.75
   },
   "actions": [
     {
@@ -22,12 +26,28 @@
         "threshold": 0.25
       },
       "exec": {
-        "command": "python",
+        "python_script": "scripts/handle_incident.py",
         "args": [
-          "scripts/handle_incident.py",
           "{source}",
           "{target}",
           "{probability}"
+        ],
+        "timeout_seconds": 20
+      }
+    },
+    {
+      "name": "python-failure-handler",
+      "when": {
+        "type": "high_failure_probability",
+        "threshold": 0.75
+      },
+      "exec": {
+        "python_script": "scripts/handle_failure.py",
+        "args": [
+          "{source}",
+          "{target}",
+          "{failure_probability}",
+          "{timestamp}"
         ],
         "timeout_seconds": 20
       }

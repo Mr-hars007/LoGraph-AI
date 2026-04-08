@@ -1,3 +1,5 @@
+"""Tkinter preview UI for graph preparation and local training actions."""
+
 from __future__ import annotations
 
 import math

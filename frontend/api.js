@@ -1,3 +1,6 @@
+// API client wrappers for user, order, and payment microservices.
+// Centralizes fetch behavior, error handling, and endpoint URLs.
+
 // ─── API Base URLs ────────────────────────────────────────────────────────────
 const USER_API    = "http://localhost:3001";
 const ORDER_API   = "http://localhost:3002";

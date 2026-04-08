@@ -1,3 +1,6 @@
+// Root storefront application shell.
+// Manages shared app state (auth, cart, navigation) and routes page components.
+
 import { useState, createContext, useContext } from "react";
 import StorePage    from "./StorePage";
 import AuthPage     from "./AuthPage";
