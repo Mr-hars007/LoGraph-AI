@@ -1,106 +1,165 @@
-// Authentication page for login and registration.
-// Integrates with user service endpoints and updates shared app session state.
+import { useState } from 'react';
+import { useApp } from './App';
+import { api } from './api';
 
-import { useState } from "react";
-import { useApp } from "./App";
-import { userApi } from "./api";
-
-const Field = ({ label, type = "text", value, onChange, placeholder }) => (
-  <div style={{ marginBottom: "18px" }}>
-    <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#5a5550", marginBottom: "7px", letterSpacing: "0.04em" }}>{label}</label>
-    <input type={type} value={value} onChange={onChange} placeholder={placeholder}
-      style={{ width: "100%", border: "1.5px solid #ede9e2", borderRadius: "10px", padding: "12px 16px", fontSize: "14px", fontFamily: "inherit", outline: "none", transition: "border-color 0.2s", background: "#fafaf8", color: "#1a1a1a" }}
-      onFocus={e => e.target.style.borderColor = "#c8a96e"}
-      onBlur={e => e.target.style.borderColor = "#ede9e2"}
-    />
-  </div>
-);
-
-export default function AuthPage() {
-  const { setUser, showToast, nav } = useApp();
-  const [mode, setMode]     = useState("login");   // login | register
+export default function AuthPage({ onSuccess }) {
+  const { toast } = useApp();
+  const [mode, setMode] = useState('login'); // 'login' | 'signup'
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError]   = useState("");
-  const [form, setForm]     = useState({ name: "", email: "", password: "", confirm: "" });
+  const [errors, setErrors] = useState({});
 
-  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }));
+  const validate = () => {
+    const e = {};
+    if (mode === 'signup' && !form.name.trim()) e.name = 'Name is required';
+    if (!form.email.includes('@')) e.email = 'Enter a valid email';
+    if (form.password.length < 6) e.password = 'Min 6 characters';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
 
   const handleSubmit = async () => {
-    setError("");
-    if (!form.email || !form.password) return setError("Please fill all required fields.");
-    if (mode === "register" && form.password !== form.confirm) return setError("Passwords do not match.");
-    if (mode === "register" && !form.name) return setError("Name is required.");
-
+    if (!validate()) return;
     setLoading(true);
     try {
-      let result;
-      if (mode === "login") {
-        // POST /api/auth/login → User Service :3001
-        result = await userApi.login(form.email, form.password);
-        setUser({ id: result.userId || result.id, name: result.name, email: form.email, token: result.token });
-        showToast(`Welcome back, ${result.name || form.email.split("@")[0]}!`);
-      } else {
-        // POST /api/users → User Service :3001
-        result = await userApi.register({ name: form.name, email: form.email, password: form.password });
-        setUser({ id: result.id, name: form.name, email: form.email, token: result.token });
-        showToast(`Account created! Welcome, ${form.name}!`);
-      }
-      nav("store");
+      const res = mode === 'login'
+        ? await api.login(form.email, form.password)
+        : await api.signup(form.name, form.email, form.password);
+      toast(`Welcome, ${res.user.name}. May your cart be full and your wallet empty.`);
+      onSuccess(res.user);
     } catch (err) {
-      // Fallback: simulate login so UI is demoable without backend running
-      if (form.email && form.password.length >= 4) {
-        const name = mode === "register" ? form.name : form.email.split("@")[0];
-        setUser({ id: "USR-DEMO", name, email: form.email, token: "demo-token" });
-        showToast(`Welcome, ${name}! (demo mode)`);
-        nav("store");
-      } else {
-        setError(mode === "login" ? "Invalid email or password." : err.message || "Registration failed.");
-      }
+      toast(err.message, 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div style={{ minHeight: "calc(100vh - 64px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px", background: "#fafaf8" }}>
-      <div style={{ width: "100%", maxWidth: "440px" }}>
-        {/* Brand */}
-        <div style={{ textAlign: "center", marginBottom: "36px" }}>
-          <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: "28px", marginBottom: "8px" }}>MART<span style={{ color: "#c8a96e" }}>·</span></div>
-          <div style={{ fontSize: "15px", color: "#9c9890" }}>{mode === "login" ? "Sign in to your account" : "Create your account"}</div>
-        </div>
+  const field = (key, label, type = 'text', placeholder = '') => (
+    <div style={{ marginBottom: '1.4rem' }}>
+      <label style={{ fontFamily: 'Cinzel, serif', fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--muted)', display: 'block', marginBottom: 8 }}>
+        {label}
+      </label>
+      <input
+        type={type}
+        value={form[key]}
+        onChange={e => { setForm(f => ({ ...f, [key]: e.target.value })); setErrors(er => ({ ...er, [key]: '' })); }}
+        placeholder={placeholder}
+        onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+        style={{
+          width: '100%', background: 'var(--bg3)',
+          border: `1px solid ${errors[key] ? 'rgba(200,60,30,0.6)' : 'var(--border)'}`,
+          color: 'var(--cream)', padding: '13px 16px',
+          fontSize: 14, fontFamily: 'DM Sans, sans-serif',
+          outline: 'none', transition: 'border 0.2s',
+        }}
+      />
+      {errors[key] && <p style={{ fontFamily: 'Cinzel, serif', fontSize: 9, color: 'rgba(220,80,50,0.9)', marginTop: 5, letterSpacing: '0.08em' }}>{errors[key]}</p>}
+    </div>
+  );
 
-        {/* Card */}
-        <div style={{ background: "#fff", borderRadius: "20px", padding: "36px", border: "1px solid #ede9e2", boxShadow: "0 4px 40px rgba(0,0,0,0.05)" }}>
+  const funnyQuotes = [
+    '"Logging in is the first step toward spending money you don\'t have."',
+    '"An account is just a cart with memory."',
+    '"Sign up. Your data is our offering."',
+  ];
+  const quote = funnyQuotes[mode === 'login' ? 0 : 1];
+
+  return (
+    <div style={{
+      minHeight: '100vh', background: 'var(--bg)',
+      display: 'grid', gridTemplateColumns: '1fr 1fr',
+    }}>
+      {/* Left panel — decorative */}
+      <div style={{
+        background: 'var(--bg2)', borderRight: '1px solid var(--border)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        padding: '4rem', position: 'relative', overflow: 'hidden',
+      }}>
+        {/* Rings */}
+        {[300, 220, 140, 60].map(r => (
+          <div key={r} style={{
+            position: 'absolute', width: r, height: r,
+            border: `1px solid rgba(200,168,75,${0.03 + (300 - r) / 300 * 0.07})`,
+            borderRadius: '50%', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }} />
+        ))}
+        <div style={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '3.5rem', fontStyle: 'italic', color: 'var(--gold)', marginBottom: '0.5rem' }}>Ishara</div>
+          <div style={{ fontFamily: 'Cinzel, serif', fontSize: 9, letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '3rem' }}>Sacred Tech Emporium</div>
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.15rem', fontStyle: 'italic', color: 'var(--sand)', lineHeight: 1.8, maxWidth: 320 }}>
+            {quote}
+          </p>
+          <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', gap: 6 }}>
+            {['📱', '💻', '🎧', '⌚'].map(e => (
+              <span key={e} style={{ fontSize: 24, opacity: 0.6 }}>{e}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right panel — form */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4rem 3rem' }}>
+        <div style={{ width: '100%', maxWidth: 400, animation: 'fadeUp 0.5s ease both' }}>
           {/* Mode toggle */}
-          <div style={{ display: "flex", background: "#f5f3ef", borderRadius: "10px", padding: "4px", marginBottom: "28px" }}>
-            {[["login","Sign In"],["register","Register"]].map(([m, label]) => (
-              <button key={m} onClick={() => { setMode(m); setError(""); }} style={{ flex: 1, padding: "9px", borderRadius: "8px", border: "none", cursor: "pointer", fontSize: "13px", fontWeight: mode === m ? 600 : 400, fontFamily: "inherit", background: mode === m ? "#fff" : "transparent", color: mode === m ? "#1a1a1a" : "#9c9890", transition: "all 0.2s", boxShadow: mode === m ? "0 1px 4px rgba(0,0,0,0.08)" : "none" }}>{label}</button>
+          <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: '2.5rem' }}>
+            {['login', 'signup'].map(m => (
+              <button key={m} onClick={() => { setMode(m); setErrors({}); }} style={{
+                flex: 1, background: 'none',
+                fontFamily: 'Cinzel, serif', fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase',
+                color: mode === m ? 'var(--gold)' : 'var(--muted)',
+                borderBottom: `2px solid ${mode === m ? 'var(--gold)' : 'transparent'}`,
+                padding: '0 0 1rem', marginBottom: -1, transition: 'all 0.25s',
+              }}>
+                {m === 'login' ? 'Login' : 'Create Account'}
+              </button>
             ))}
           </div>
 
-          {mode === "register" && <Field label="Full Name" value={form.name} onChange={set("name")} placeholder="Harsha C K" />}
-          <Field label="Email Address" type="email" value={form.email} onChange={set("email")} placeholder="you@example.com" />
-          <Field label="Password" type="password" value={form.password} onChange={set("password")} placeholder="Min. 4 characters" />
-          {mode === "register" && <Field label="Confirm Password" type="password" value={form.confirm} onChange={set("confirm")} placeholder="Re-enter password" />}
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', fontWeight: 300, color: 'var(--cream)', marginBottom: '0.4rem' }}>
+            {mode === 'login' ? 'Welcome back,' : 'Begin your'}
+          </h1>
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', fontStyle: 'italic', color: 'var(--gold)', marginBottom: '2rem' }}>
+            {mode === 'login' ? 'seeker.' : 'journey.'}
+          </p>
 
-          {error && <div style={{ marginBottom: "16px", padding: "11px 14px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", fontSize: "13px", color: "#b91c1c" }}>{error}</div>}
+          {mode === 'signup' && field('name', 'Full Name', 'text', 'Enlightened Kumar')}
+          {field('email', 'Email Address', 'email', 'seeker@universe.com')}
+          {field('password', 'Password', 'password', '••••••••')}
 
-          <button onClick={handleSubmit} disabled={loading} style={{ width: "100%", background: "#1a1a1a", color: "#fff", border: "none", borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: loading ? 0.7 : 1, transition: "opacity 0.2s" }}>
-            {loading ? "Please wait…" : mode === "login" ? "Sign In →" : "Create Account →"}
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            style={{
+              width: '100%', background: loading ? 'var(--bg4)' : 'var(--gold)',
+              color: loading ? 'var(--muted)' : 'var(--bg)',
+              fontFamily: 'Cinzel, serif', fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase',
+              padding: '15px', marginBottom: '1rem', transition: 'all 0.25s',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            }}
+          >
+            {loading ? (
+              <>
+                <span style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid var(--muted)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                Processing...
+              </>
+            ) : mode === 'login' ? 'Enter the Temple' : 'Join the Order'}
           </button>
 
-          <div style={{ marginTop: "20px", textAlign: "center", fontSize: "13px", color: "#9c9890" }}>
-            {mode === "login" ? "Don't have an account? " : "Already have an account? "}
-            <button onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(""); }} style={{ background: "none", border: "none", color: "#c8a96e", cursor: "pointer", fontFamily: "inherit", fontSize: "13px", fontWeight: 600 }}>
-              {mode === "login" ? "Register" : "Sign In"}
+          <p style={{ fontFamily: 'Cinzel, serif', fontSize: 10, letterSpacing: '0.08em', color: 'var(--muted)', textAlign: 'center' }}>
+            {mode === 'login' ? "Don't have an account? " : 'Already initiated? '}
+            <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setErrors({}); }} style={{
+              background: 'none', color: 'var(--gold)', fontFamily: 'Cinzel, serif', fontSize: 10, letterSpacing: '0.08em',
+              textDecoration: 'underline', textUnderlineOffset: 3,
+            }}>
+              {mode === 'login' ? 'Sign up' : 'Login'}
             </button>
-          </div>
-        </div>
+          </p>
 
-        {/* Note */}
-        <div style={{ marginTop: "20px", textAlign: "center", fontSize: "12px", color: "#b0ada6", lineHeight: 1.6 }}>
-          Calls <code style={{ background: "#f0ede8", padding: "2px 6px", borderRadius: "4px", fontSize: "11px" }}>POST /api/auth/login</code> on User Service :3001
+          <div style={{ marginTop: '2rem', padding: '1rem', border: '1px solid var(--border)', background: 'var(--bg2)' }}>
+            <p style={{ fontFamily: 'Cinzel, serif', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 6 }}>Demo credentials</p>
+            <p style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, color: 'var(--sand)' }}>any@email.com · anypassword</p>
+          </div>
         </div>
       </div>
     </div>
