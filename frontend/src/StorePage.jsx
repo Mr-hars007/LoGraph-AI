@@ -154,13 +154,13 @@ function Hero({ onShop }) {
         </p>
         <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2.4rem,4.5vw,4rem)', fontWeight: 300, lineHeight: 1.1, color: 'var(--cream)', marginBottom: '0.8rem' }}>
           Tech That Costs<br />
-          More Than Your <em style={{ fontStyle: 'italic', color: 'var(--gold)' }}>Soul</em>
+          More Than Your <em style={{ fontStyle: 'italic', color: 'var(--gold)' }}>Weekend Budget</em>
         </h1>
         <p style={{ fontFamily: 'Cinzel, serif', fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '1.8rem' }}>
           Sacred Electronics · Probably Overpriced
         </p>
         <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontStyle: 'italic', color: 'var(--sand)', lineHeight: 1.8, maxWidth: 420, marginBottom: '2.5rem' }}>
-          Curated gadgets for those who seek enlightenment through unboxing. Free shipping. No refunds on awakening.
+          Curated gadgets for those who seek enlightenment through unboxing. Free shipping. Great stories guaranteed.
         </p>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <button onClick={onShop} style={{
@@ -194,7 +194,7 @@ function Hero({ onShop }) {
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
           <div style={{ fontSize: 96, marginBottom: 16, filter: 'drop-shadow(0 0 30px rgba(200,168,75,0.2))' }}>📱</div>
           <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', color: 'var(--gold)', marginBottom: 4 }}>₹89,999</div>
-          <div style={{ fontFamily: 'Cinzel, serif', fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--muted)' }}>Samsang Galaxxy S69 Ultra</div>
+          <div style={{ fontFamily: 'Cinzel, serif', fontSize: 9, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--muted)' }}>Samsang Galaxxy S67 Ultra</div>
         </div>
         {/* Corner ornaments */}
         <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', width: 60, height: 60, border: '1px solid var(--border)', borderRadius: '50%', opacity: 0.4 }} />
@@ -266,7 +266,7 @@ export default function StorePage() {
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <p style={{ fontFamily: 'Cinzel, serif', fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.7rem' }}>Browse by Category</p>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(1.6rem,3vw,2.6rem)', fontWeight: 300, color: 'var(--cream)' }}>
-            Find What <em style={{ fontStyle: 'italic', color: 'var(--gold)' }}>Drains</em> Your Wallet
+            Find What <em style={{ fontStyle: 'italic', color: 'var(--gold)' }}>Sparks</em> Your Geek Joy
           </h2>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: '1rem' }}>

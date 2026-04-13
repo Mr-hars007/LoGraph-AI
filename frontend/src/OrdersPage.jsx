@@ -250,7 +250,7 @@ export default function OrdersPage() {
           <div style={{ textAlign: 'center', padding: '5rem 0' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>📦</div>
             <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.3rem', fontStyle: 'italic', color: 'var(--muted)' }}>
-              No orders here. The void is real.
+              No orders here yet. Your next masterpiece is waiting.
             </p>
             <button onClick={() => setPage('store')} style={{
               marginTop: '1.5rem', background: 'var(--gold)', color: 'var(--bg)',

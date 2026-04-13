@@ -437,7 +437,7 @@ export default function App() {
   const handleLogout = async () => {
     await api.logout();
     setUser(null);
-    toast('Logged out. The void awaits.');
+    toast('Logged out. Snack break mode activated.');
     setPage('store');
   };
 

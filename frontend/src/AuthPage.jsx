@@ -25,7 +25,7 @@ export default function AuthPage({ onSuccess }) {
       const res = mode === 'login'
         ? await api.login(form.email, form.password)
         : await api.signup(form.name, form.email, form.password);
-      toast(`Welcome, ${res.user.name}. May your cart be full and your wallet empty.`);
+      toast(`Welcome, ${res.user.name}. May your cart be full and your coupons stronger.`);
       onSuccess(res.user);
     } catch (err) {
       toast(err.message, 'error');
@@ -58,9 +58,9 @@ export default function AuthPage({ onSuccess }) {
   );
 
   const funnyQuotes = [
-    '"Logging in is the first step toward spending money you don\'t have."',
+    '"Logging in is the first step toward adding five things and buying one."',
     '"An account is just a cart with memory."',
-    '"Sign up. Your data is our offering."',
+    '"Sign up. Your wishlist deserves better organization."',
   ];
   const quote = funnyQuotes[mode === 'login' ? 0 : 1];
 

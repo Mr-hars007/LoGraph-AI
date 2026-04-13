@@ -94,7 +94,7 @@ function PaymentStep({ data, onChange, onNext, onBack }) {
   return (
     <div>
       <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', fontWeight: 300, color: 'var(--cream)', marginBottom: '0.3rem' }}>Payment</h2>
-      <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', fontStyle: 'italic', color: 'var(--muted)', marginBottom: '2rem' }}>The moment of reckoning. Choose your sacrifice.</p>
+      <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', fontStyle: 'italic', color: 'var(--muted)', marginBottom: '2rem' }}>The final step before victory. Pick your payment style.</p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '2rem' }}>
         {PAYMENT_METHODS.map(m => (
