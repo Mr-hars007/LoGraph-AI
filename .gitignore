@@ -21,3 +21,4 @@ Thumbs.db
 *.log
 
 frontend/node_modules
+lograph-tool.json
