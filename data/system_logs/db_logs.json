@@ -1,0 +1,56 @@
+[
+    {
+        "source": "gateway",
+        "target": "user-service",
+        "timestamp": "2026-04-14T16:10:23.716962",
+        "status": "success",
+        "latency": 0.0026,
+        "message": "Created user file@example.com",
+        "id": "5d9c0888-d512-481b-bd22-f21c0c5755f3"
+    },
+    {
+        "source": "gateway",
+        "target": "user-service",
+        "timestamp": "2026-04-15T05:00:06.187583",
+        "status": "failure",
+        "latency": 0.0161,
+        "message": "Login attempt for sivapanyam1@gmail.com",
+        "id": "ee510e38-dd40-471d-a73f-287a4fd58203"
+    },
+    {
+        "source": "gateway",
+        "target": "order-service",
+        "timestamp": "2026-04-15T05:00:23.308069",
+        "status": "success",
+        "latency": 0.0024,
+        "message": "Order 002e004a-7a9e-4ad3-a414-3c9b5f0602d3 created",
+        "id": "b58c97b2-d6a7-4bc5-a1fc-b4800e4b636c"
+    },
+    {
+        "source": "order-service",
+        "target": "payment-service",
+        "timestamp": "2026-04-15T05:00:23.827173",
+        "status": "success",
+        "latency": 0.1789,
+        "message": "TXN: a2e13a91-9108-468d-a26a-66c0e2691bd3",
+        "id": "ccba4fb0-4001-45b9-9576-f910c3fcf4eb"
+    },
+    {
+        "source": "gateway",
+        "target": "order-service",
+        "timestamp": "2026-04-15T05:00:25.857732",
+        "status": "success",
+        "latency": 0.0222,
+        "message": "Fetched 1 orders for user USR-DEMO",
+        "id": "530554e3-3961-4736-af11-7ba79259f3b8"
+    },
+    {
+        "source": "gateway",
+        "target": "order-service",
+        "timestamp": "2026-04-15T05:00:26.203717",
+        "status": "success",
+        "latency": 0.0,
+        "message": "Fetched 1 orders for user USR-DEMO",
+        "id": "c778456e-0e7b-426a-bdbe-33157bfd60aa"
+    }
+]

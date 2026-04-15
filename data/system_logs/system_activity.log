@@ -1,0 +1,125 @@
+2026-04-14 21:27:59,426 | INFO     | [werkzeug] | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.2.126:5005
+2026-04-14 21:27:59,426 | INFO     | [werkzeug] | [33mPress CTRL+C to quit[0m
+2026-04-14 21:27:59,436 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-14 21:28:01,757 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-14 21:28:01,762 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-14 21:28:08,884 | INFO     | [SystemFlow] | REQUEST START: POST /users | Remote: 127.0.0.1
+2026-04-14 21:28:08,891 | INFO     | [SystemFlow] | FLOW: gateway -> user-service | Status: success | Latency: 0.0065s | Info: Created user user2@example.com
+2026-04-14 21:28:08,892 | INFO     | [SystemFlow] | REQUEST END:   POST /users | Status: 201 | Latency: 0.0081s
+2026-04-14 21:28:08,893 | INFO     | [werkzeug] | 127.0.0.1 - - [14/Apr/2026 21:28:08] "[35m[1mPOST /users HTTP/1.1[0m" 201 -
+2026-04-14 21:28:08,935 | INFO     | [SystemFlow] | REQUEST START: POST /orders | Remote: 127.0.0.1
+2026-04-14 21:28:08,938 | INFO     | [SystemFlow] | FLOW: gateway -> order-service | Status: success | Latency: 0.0021s | Info: Order ORD-7087 created
+2026-04-14 21:28:08,940 | INFO     | [SystemFlow] | REQUEST END:   POST /orders | Status: 201 | Latency: 0.0048s
+2026-04-14 21:28:08,940 | INFO     | [werkzeug] | 127.0.0.1 - - [14/Apr/2026 21:28:08] "[35m[1mPOST /orders HTTP/1.1[0m" 201 -
+2026-04-14 21:28:08,947 | INFO     | [SystemFlow] | REQUEST START: POST /pay | Remote: 127.0.0.1
+2026-04-14 21:28:09,177 | INFO     | [SystemFlow] | FLOW: order-service -> payment-service | Status: success | Latency: 0.2286s | Info: TXN: TXN-444401
+2026-04-14 21:28:09,182 | INFO     | [SystemFlow] | REQUEST END:   POST /pay | Status: 200 | Latency: 0.235s
+2026-04-14 21:28:09,182 | INFO     | [werkzeug] | 127.0.0.1 - - [14/Apr/2026 21:28:09] "POST /pay HTTP/1.1" 200 -
+2026-04-14 21:28:14,645 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 1.14s.
+2026-04-14 21:28:20,389 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to jaeger:4317, error code: StatusCode.UNAVAILABLE
+2026-04-14 21:28:30,512 | INFO     | [SystemFlow] | REQUEST START: POST /pay | Remote: 127.0.0.1
+2026-04-14 21:28:30,647 | INFO     | [SystemFlow] | FLOW: order-service -> payment-service | Status: success | Latency: 0.1352s | Info: TXN: TXN-406072
+2026-04-14 21:28:30,651 | INFO     | [SystemFlow] | REQUEST END:   POST /pay | Status: 200 | Latency: 0.1393s
+2026-04-14 21:28:30,652 | INFO     | [werkzeug] | 127.0.0.1 - - [14/Apr/2026 21:28:30] "POST /pay HTTP/1.1" 200 -
+2026-04-14 21:28:35,412 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 1.14s.
+2026-04-14 21:28:40,686 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 3.29s.
+2026-04-14 21:28:43,975 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to jaeger:4317, error code: StatusCode.UNAVAILABLE
+2026-04-14 21:40:17,283 | INFO     | [werkzeug] | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://192.168.2.126:5005
+2026-04-14 21:40:17,284 | INFO     | [werkzeug] | [33mPress CTRL+C to quit[0m
+2026-04-14 21:40:17,296 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-14 21:40:19,020 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-14 21:40:19,025 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-14 21:40:23,713 | INFO     | [SystemFlow] | REQUEST START: POST /users | Remote: 127.0.0.1
+2026-04-14 21:40:23,716 | INFO     | [SystemFlow] | FLOW: gateway -> user-service | Status: success | Latency: 0.0026s | Info: Created user file@example.com
+2026-04-14 21:40:23,719 | INFO     | [SystemFlow] | REQUEST END:   POST /users | Status: 201 | Latency: 0.0063s
+2026-04-14 21:40:23,720 | INFO     | [werkzeug] | 127.0.0.1 - - [14/Apr/2026 21:40:23] "[35m[1mPOST /users HTTP/1.1[0m" 201 -
+2026-04-14 21:40:26,918 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 1.12s.
+2026-04-14 21:40:32,495 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to jaeger:4317, error code: StatusCode.UNAVAILABLE
+2026-04-15 10:25:39,928 | INFO     | [werkzeug] | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://10.105.177.183:5005
+2026-04-15 10:25:39,930 | INFO     | [werkzeug] | [33mPress CTRL+C to quit[0m
+2026-04-15 10:25:39,964 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-15 10:25:42,832 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-15 10:25:42,837 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-15 10:26:38,153 | INFO     | [SystemFlow] | REQUEST START: GET / | Remote: 127.0.0.1
+2026-04-15 10:26:38,157 | INFO     | [SystemFlow] | REQUEST END:   GET / | Status: 404 | Latency: 0.0035s
+2026-04-15 10:26:38,159 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:26:38] "[33mGET / HTTP/1.1[0m" 404 -
+2026-04-15 10:26:38,227 | INFO     | [SystemFlow] | REQUEST START: GET /favicon.ico | Remote: 127.0.0.1
+2026-04-15 10:26:38,229 | INFO     | [SystemFlow] | REQUEST END:   GET /favicon.ico | Status: 404 | Latency: 0.0013s
+2026-04-15 10:26:38,231 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:26:38] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-04-15 10:26:45,817 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 0.93s.
+2026-04-15 10:26:51,612 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to jaeger:4317, error code: StatusCode.UNAVAILABLE
+2026-04-15 10:26:53,641 | INFO     | [SystemFlow] | REQUEST START: GET /health | Remote: 127.0.0.1
+2026-04-15 10:26:53,642 | INFO     | [SystemFlow] | REQUEST END:   GET /health | Status: 200 | Latency: 0.001s
+2026-04-15 10:26:53,645 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:26:53] "GET /health HTTP/1.1" 200 -
+2026-04-15 10:26:56,624 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 1.16s.
+2026-04-15 10:27:00,713 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 2.32s.
+2026-04-15 10:27:03,047 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to jaeger:4317, error code: StatusCode.UNAVAILABLE
+2026-04-15 10:27:53,827 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\unified_app.py', reloading
+2026-04-15 10:27:54,096 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-15 10:27:57,423 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-15 10:27:57,430 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-15 10:28:22,147 | INFO     | [SystemFlow] | REQUEST START: GET / | Remote: 127.0.0.1
+2026-04-15 10:28:22,148 | INFO     | [SystemFlow] | REQUEST END:   GET / | Status: 200 | Latency: 0.0009s
+2026-04-15 10:28:22,151 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:28:22] "GET / HTTP/1.1" 200 -
+2026-04-15 10:28:25,323 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 1.06s.
+2026-04-15 10:28:31,310 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to jaeger:4317, error code: StatusCode.UNAVAILABLE
+2026-04-15 10:29:46,326 | INFO     | [SystemFlow] | REQUEST START: GET /graph | Remote: 127.0.0.1
+2026-04-15 10:29:46,330 | INFO     | [SystemFlow] | REQUEST END:   GET /graph | Status: 200 | Latency: 0.0037s
+2026-04-15 10:29:46,331 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:29:46] "GET /graph HTTP/1.1" 200 -
+2026-04-15 10:29:46,417 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 1.06s.
+2026-04-15 10:29:55,916 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to jaeger:4317, error code: StatusCode.UNAVAILABLE
+2026-04-15 10:30:05,905 | INFO     | [SystemFlow] | REQUEST START: OPTIONS /users/login | Remote: 127.0.0.1
+2026-04-15 10:30:05,905 | INFO     | [SystemFlow] | REQUEST END:   OPTIONS /users/login | Status: 200 | Latency: 0.0s
+2026-04-15 10:30:05,906 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:30:05] "OPTIONS /users/login HTTP/1.1" 200 -
+2026-04-15 10:30:05,934 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 1.18s.
+2026-04-15 10:30:06,169 | INFO     | [SystemFlow] | REQUEST START: POST /users/login | Remote: 127.0.0.1
+2026-04-15 10:30:06,187 | WARNING  | [SystemFlow] | FLOW: gateway -> user-service | Status: failure | Latency: 0.0161s | Info: Login attempt for sivapanyam1@gmail.com
+2026-04-15 10:30:06,189 | INFO     | [SystemFlow] | REQUEST END:   POST /users/login | Status: 401 | Latency: 0.0205s
+2026-04-15 10:30:06,190 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:30:06] "[31m[1mPOST /users/login HTTP/1.1[0m" 401 -
+2026-04-15 10:30:11,729 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to jaeger:4317, error code: StatusCode.UNAVAILABLE
+2026-04-15 10:30:16,739 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 1.11s.
+2026-04-15 10:30:20,794 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 2.23s.
+2026-04-15 10:30:22,993 | INFO     | [SystemFlow] | REQUEST START: OPTIONS /orders | Remote: 127.0.0.1
+2026-04-15 10:30:22,995 | INFO     | [SystemFlow] | REQUEST END:   OPTIONS /orders | Status: 200 | Latency: 0.0015s
+2026-04-15 10:30:22,996 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:30:22] "OPTIONS /orders HTTP/1.1" 200 -
+2026-04-15 10:30:23,035 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to jaeger:4317, error code: StatusCode.UNAVAILABLE
+2026-04-15 10:30:23,305 | INFO     | [SystemFlow] | REQUEST START: POST /orders | Remote: 127.0.0.1
+2026-04-15 10:30:23,308 | INFO     | [SystemFlow] | FLOW: gateway -> order-service | Status: success | Latency: 0.0024s | Info: Order 002e004a-7a9e-4ad3-a414-3c9b5f0602d3 created
+2026-04-15 10:30:23,334 | INFO     | [SystemFlow] | REQUEST END:   POST /orders | Status: 201 | Latency: 0.0289s
+2026-04-15 10:30:23,336 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:30:23] "[35m[1mPOST /orders HTTP/1.1[0m" 201 -
+2026-04-15 10:30:23,569 | INFO     | [SystemFlow] | REQUEST START: OPTIONS /pay | Remote: 127.0.0.1
+2026-04-15 10:30:23,570 | INFO     | [SystemFlow] | REQUEST END:   OPTIONS /pay | Status: 200 | Latency: 0.0017s
+2026-04-15 10:30:23,572 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:30:23] "OPTIONS /pay HTTP/1.1" 200 -
+2026-04-15 10:30:23,647 | INFO     | [SystemFlow] | REQUEST START: POST /pay | Remote: 127.0.0.1
+2026-04-15 10:30:23,827 | INFO     | [SystemFlow] | FLOW: order-service -> payment-service | Status: success | Latency: 0.1789s | Info: TXN: a2e13a91-9108-468d-a26a-66c0e2691bd3
+2026-04-15 10:30:23,865 | INFO     | [SystemFlow] | REQUEST END:   POST /pay | Status: 200 | Latency: 0.2184s
+2026-04-15 10:30:23,867 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:30:23] "POST /pay HTTP/1.1" 200 -
+2026-04-15 10:30:25,525 | INFO     | [SystemFlow] | REQUEST START: OPTIONS /orders | Remote: 127.0.0.1
+2026-04-15 10:30:25,525 | INFO     | [SystemFlow] | REQUEST END:   OPTIONS /orders | Status: 200 | Latency: 0.0s
+2026-04-15 10:30:25,527 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:30:25] "OPTIONS /orders?userId=USR-DEMO HTTP/1.1" 200 -
+2026-04-15 10:30:25,832 | INFO     | [SystemFlow] | REQUEST START: OPTIONS /orders | Remote: 127.0.0.1
+2026-04-15 10:30:25,833 | INFO     | [SystemFlow] | REQUEST END:   OPTIONS /orders | Status: 200 | Latency: 0.0015s
+2026-04-15 10:30:25,834 | INFO     | [SystemFlow] | REQUEST START: GET /orders | Remote: 127.0.0.1
+2026-04-15 10:30:25,835 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:30:25] "OPTIONS /orders?userId=USR-DEMO HTTP/1.1" 200 -
+2026-04-15 10:30:25,859 | INFO     | [SystemFlow] | FLOW: gateway -> order-service | Status: success | Latency: 0.0222s | Info: Fetched 1 orders for user USR-DEMO
+2026-04-15 10:30:25,884 | INFO     | [SystemFlow] | REQUEST END:   GET /orders | Status: 200 | Latency: 0.0503s
+2026-04-15 10:30:25,886 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:30:25] "GET /orders?userId=USR-DEMO HTTP/1.1" 200 -
+2026-04-15 10:30:26,202 | INFO     | [SystemFlow] | REQUEST START: GET /orders | Remote: 127.0.0.1
+2026-04-15 10:30:26,203 | INFO     | [SystemFlow] | FLOW: gateway -> order-service | Status: success | Latency: 0.0s | Info: Fetched 1 orders for user USR-DEMO
+2026-04-15 10:30:26,223 | INFO     | [SystemFlow] | REQUEST END:   GET /orders | Status: 200 | Latency: 0.021s
+2026-04-15 10:30:26,224 | INFO     | [werkzeug] | 127.0.0.1 - - [15/Apr/2026 10:30:26] "GET /orders?userId=USR-DEMO HTTP/1.1" 200 -
+2026-04-15 10:30:28,039 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to jaeger:4317, retrying in 0.96s.
+2026-04-15 10:30:37,822 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to jaeger:4317, error code: StatusCode.UNAVAILABLE
+2026-04-15 10:30:54,624 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\unified_app.py', reloading
+2026-04-15 10:30:54,940 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-15 10:30:58,921 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-15 10:30:58,929 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670

@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
+  user_service:
+    build:
+      context: .
+      dockerfile: services/user_service/Dockerfile
+    container_name: user_service
+    ports:
+      - "5001:5001"
+    environment:
+      - USER_SERVICE_PORT=5001
+      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    depends_on:
+      - jaeger
+
+  order_service:
+    build:
+      context: .
+      dockerfile: services/order_service/Dockerfile
+    container_name: order_service
+    ports:
+      - "5002:5002"
+    environment:
+      - USER_SERVICE_URL=http://user_service:5001
+      - PAYMENT_SERVICE_URL=http://payment_service:5003
+      - ORDER_SERVICE_PORT=5002
+      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    depends_on:
+      - user_service
+      - payment_service
+      - jaeger
+
+  payment_service:
+    build:
+      context: .
+      dockerfile: services/payment_service/Dockerfile
+    container_name: payment_service
+    ports:
+      - "5003:5003"
+    environment:
+      - PAYMENT_SERVICE_PORT=5003
+      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    depends_on:
+      - jaeger
+
+  api_gateway:
+    build:
+      context: .
+      dockerfile: api_gateway/Dockerfile
+    container_name: api_gateway
+    ports:
+      - "5005:5005"
+    environment:
+      - USER_SERVICE_URL=http://user_service:5001
+      - ORDER_SERVICE_URL=http://order_service:5002
+      - PAYMENT_SERVICE_URL=http://payment_service:5003
+      - GATEWAY_PORT=5005
+      - OTEL_EXPORTER_OTLP_ENDPOINT=jaeger:4317
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    depends_on:
+      - user_service
+      - order_service
+      - payment_service
+      - jaeger
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api_gateway

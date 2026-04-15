@@ -1,0 +1,104 @@
+2026-04-08 12:12:39,394 | INFO     | [werkzeug] | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://10.105.177.183:5005
+2026-04-08 12:12:39,395 | INFO     | [werkzeug] | [33mPress CTRL+C to quit[0m
+2026-04-08 12:12:39,422 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:12:42,314 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:12:42,326 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:16:50,134 | INFO     | [werkzeug] | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5005
+ * Running on http://10.105.177.183:5005
+2026-04-08 12:16:50,135 | INFO     | [werkzeug] | [33mPress CTRL+C to quit[0m
+2026-04-08 12:16:50,165 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:16:53,465 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:16:53,475 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:18:12,340 | INFO     | [SystemFlow] | REQUEST START: GET / | Remote: 127.0.0.1
+2026-04-08 12:18:12,353 | INFO     | [SystemFlow] | REQUEST END:   GET / | Status: 404 | Latency: 0.0123s
+2026-04-08 12:18:12,355 | INFO     | [werkzeug] | 127.0.0.1 - - [08/Apr/2026 12:18:12] "[33mGET / HTTP/1.1[0m" 404 -
+2026-04-08 12:18:12,535 | INFO     | [SystemFlow] | REQUEST START: GET /favicon.ico | Remote: 127.0.0.1
+2026-04-08 12:18:12,536 | INFO     | [SystemFlow] | REQUEST END:   GET /favicon.ico | Status: 404 | Latency: 0.001s
+2026-04-08 12:18:12,536 | INFO     | [werkzeug] | 127.0.0.1 - - [08/Apr/2026 12:18:12] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-04-08 12:18:15,112 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to localhost:4317, retrying in 1.09s.
+2026-04-08 12:18:20,125 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to localhost:4317, error code: StatusCode.UNAVAILABLE
+2026-04-08 12:18:27,644 | INFO     | [SystemFlow] | REQUEST START: OPTIONS /users/login | Remote: 127.0.0.1
+2026-04-08 12:18:27,645 | INFO     | [SystemFlow] | REQUEST END:   OPTIONS /users/login | Status: 200 | Latency: 0.001s
+2026-04-08 12:18:27,646 | INFO     | [werkzeug] | 127.0.0.1 - - [08/Apr/2026 12:18:27] "OPTIONS /users/login HTTP/1.1" 200 -
+2026-04-08 12:18:27,909 | INFO     | [SystemFlow] | REQUEST START: POST /users/login | Remote: 127.0.0.1
+2026-04-08 12:18:27,948 | WARNING  | [SystemFlow] | FLOW: gateway -> user-service | Status: failure | Latency: 0.037s | Info: Login attempt for sivapanyam1@gmail.com
+2026-04-08 12:18:27,972 | INFO     | [SystemFlow] | REQUEST END:   POST /users/login | Status: 401 | Latency: 0.0631s
+2026-04-08 12:18:27,973 | INFO     | [werkzeug] | 127.0.0.1 - - [08/Apr/2026 12:18:27] "[31m[1mPOST /users/login HTTP/1.1[0m" 401 -
+2026-04-08 12:18:30,144 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to localhost:4317, retrying in 0.97s.
+2026-04-08 12:18:35,569 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to localhost:4317, error code: StatusCode.UNAVAILABLE
+2026-04-08 12:18:35,759 | INFO     | [SystemFlow] | REQUEST START: GET / | Remote: 127.0.0.1
+2026-04-08 12:18:35,760 | INFO     | [SystemFlow] | REQUEST END:   GET / | Status: 404 | Latency: 0.001s
+2026-04-08 12:18:35,760 | INFO     | [werkzeug] | 127.0.0.1 - - [08/Apr/2026 12:18:35] "[33mGET / HTTP/1.1[0m" 404 -
+2026-04-08 12:18:40,574 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to localhost:4317, retrying in 0.84s.
+2026-04-08 12:18:49,625 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to localhost:4317, error code: StatusCode.UNAVAILABLE
+2026-04-08 12:19:27,014 | INFO     | [SystemFlow] | REQUEST START: OPTIONS /orders | Remote: 127.0.0.1
+2026-04-08 12:19:27,017 | INFO     | [SystemFlow] | REQUEST END:   OPTIONS /orders | Status: 200 | Latency: 0.004s
+2026-04-08 12:19:27,020 | INFO     | [werkzeug] | 127.0.0.1 - - [08/Apr/2026 12:19:27] "OPTIONS /orders?userId=USR-DEMO HTTP/1.1" 200 -
+2026-04-08 12:19:27,324 | INFO     | [SystemFlow] | REQUEST START: OPTIONS /orders | Remote: 127.0.0.1
+2026-04-08 12:19:27,325 | INFO     | [SystemFlow] | REQUEST END:   OPTIONS /orders | Status: 200 | Latency: 0.0011s
+2026-04-08 12:19:27,327 | INFO     | [werkzeug] | 127.0.0.1 - - [08/Apr/2026 12:19:27] "OPTIONS /orders?userId=USR-DEMO HTTP/1.1" 200 -
+2026-04-08 12:19:27,331 | INFO     | [SystemFlow] | REQUEST START: GET /orders | Remote: 127.0.0.1
+2026-04-08 12:19:27,343 | INFO     | [SystemFlow] | FLOW: gateway -> order-service | Status: success | Latency: 0.0121s | Info: Fetched 0 orders for user USR-DEMO
+2026-04-08 12:19:27,348 | INFO     | [SystemFlow] | REQUEST END:   GET /orders | Status: 200 | Latency: 0.0183s
+2026-04-08 12:19:27,349 | INFO     | [werkzeug] | 127.0.0.1 - - [08/Apr/2026 12:19:27] "GET /orders?userId=USR-DEMO HTTP/1.1" 200 -
+2026-04-08 12:19:27,668 | INFO     | [SystemFlow] | REQUEST START: GET /orders | Remote: 127.0.0.1
+2026-04-08 12:19:27,675 | INFO     | [SystemFlow] | FLOW: gateway -> order-service | Status: success | Latency: 0.0034s | Info: Fetched 0 orders for user USR-DEMO
+2026-04-08 12:19:27,679 | INFO     | [SystemFlow] | REQUEST END:   GET /orders | Status: 200 | Latency: 0.0105s
+2026-04-08 12:19:27,680 | INFO     | [werkzeug] | 127.0.0.1 - - [08/Apr/2026 12:19:27] "GET /orders?userId=USR-DEMO HTTP/1.1" 200 -
+2026-04-08 12:19:29,701 | WARNING  | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Transient error StatusCode.UNAVAILABLE encountered while exporting traces to localhost:4317, retrying in 0.85s.
+2026-04-08 12:19:39,341 | ERROR    | [opentelemetry.exporter.otlp.proto.grpc.exporter] | Failed to export traces to localhost:4317, error code: StatusCode.UNAVAILABLE
+2026-04-08 12:20:35,933 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\api-gateway\\app.py', reloading
+2026-04-08 12:20:35,933 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\api-gateway\\app.py', reloading
+2026-04-08 12:20:36,466 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:20:36,842 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:20:39,551 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:20:39,556 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:20:39,688 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:20:39,694 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:20:46,790 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\api-gateway\\routes\\gateway_routes.py', reloading
+2026-04-08 12:20:46,792 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\api-gateway\\routes\\gateway_routes.py', reloading
+2026-04-08 12:20:46,792 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\api-gateway\\routes\\gateway_routes.py', reloading
+2026-04-08 12:20:46,794 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\api-gateway\\routes\\gateway_routes.py', reloading
+2026-04-08 12:20:47,573 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:20:47,715 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:20:51,340 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:20:51,355 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:20:51,390 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:20:51,404 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:21:10,184 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\api-gateway\\services\\graph_service.py', reloading
+2026-04-08 12:21:10,184 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\api-gateway\\services\\graph_service.py', reloading
+2026-04-08 12:21:10,831 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:21:10,858 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:21:15,616 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:21:15,621 | WARNING  | [werkzeug] |  * Debugger is active!
+-670
+2026-04-08 12:21:15,626 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:21:23,413 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\services\\user-service\\config\\db.py', reloading
+2026-04-08 12:21:23,413 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\services\\user-service\\config\\db.py', reloading
+2026-04-08 12:21:24,030 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:21:24,050 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:21:27,005 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:21:27,006 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:21:27,012 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:21:27,012 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:21:37,480 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\services\\order-service\\services\\order_service.py', reloading
+2026-04-08 12:21:37,481 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\services\\order-service\\services\\order_service.py', reloading
+2026-04-08 12:21:38,294 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:21:38,307 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:21:41,091 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:21:41,092 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:21:41,097 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:21:41,100 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:22:02,578 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\services\\payment-service\\services\\payment_service.py', reloading
+2026-04-08 12:22:02,578 | INFO     | [werkzeug] |  * Detected change in 'C:\\Users\\sivap\\OneDrive\\Desktop\\lograph\\LoGraph-AI\\services\\payment-service\\services\\payment_service.py', reloading
+2026-04-08 12:22:03,462 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:22:03,474 | INFO     | [werkzeug] |  * Restarting with watchdog (windowsapi)
+2026-04-08 12:22:06,306 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:22:06,307 | WARNING  | [werkzeug] |  * Debugger is active!
+2026-04-08 12:22:06,313 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
+2026-04-08 12:22:06,313 | INFO     | [werkzeug] |  * Debugger PIN: 672-563-670
