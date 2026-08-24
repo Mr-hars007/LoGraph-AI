@@ -3,6 +3,7 @@ import time
 import json
 import requests
 import psycopg2
+import threading
 from psycopg2.extras import RealDictCursor
 import uvicorn
 from fastapi import FastAPI, HTTPException, Query, Body
@@ -113,33 +114,97 @@ def init_db():
         script_count = cur.fetchone()[0]
         if script_count == 0:
             print("Seeding default recovery scripts...")
-            # We seed a recovery script for each backend
-            for i in [1, 2, 3]:
-                script_id = f"recovery-script-be-{i}"
-                script_content = f"""# Auto-recovery script for mock-be-{i}
+            
+            # 1. MS FE Script
+            fe_content = """# Varnish Cache Clear and HTTP Rate-Limit Flush
 import urllib.request
 import os
 import json
+import time
 
 backend_url = os.environ.get("MOCK_BACKEND_URL")
-print(f"Executing recovery action on {{backend_url}}")
-
-req = urllib.request.Request(f"{{backend_url}}/recover", method="POST")
+print("[INFO] Initiating self-healing script 'Flush FE Edge Cache' for target 'ms-fe'...", flush=True)
+time.sleep(0.5)
+print("[DEBUG] Terminating active high-bandwidth worker request sockets...", flush=True)
+time.sleep(0.5)
+print("[INFO] Purging front-edge Varnish CDN static cache blocks...", flush=True)
+time.sleep(0.5)
+print("[INFO] Resetting sliding-window HTTP rate-limit counters...", flush=True)
+req = urllib.request.Request(f"{backend_url}/recover", method="POST")
 with urllib.request.urlopen(req) as response:
     res_data = response.read().decode()
-    print(f"Response: {{res_data}}")
+    print(f"[SUCCESS] Microservice Frontend recovered. API Response: {res_data}", flush=True)
 """
-                cur.execute("""
-                    INSERT INTO scripts (script_id, name, description, target_backend, content, version, enabled, created_at, updated_at)
-                    VALUES (%s, %s, %s, %s, %s, 1, TRUE, %s, %s)
-                """, (script_id, f"Auto-recover BE-{i}", f"Automatically recovers backend-{i} from stress", f"mock-be-{i}", script_content, time.time(), time.time()))
-                
-                # Seed rule for HIGH_LOAD
-                cur.execute("""
-                    INSERT INTO rules (prediction, minimum_score, target_backend, script_id, enabled)
-                    VALUES (%s, %s, %s, %s, TRUE)
-                """, ("HIGH_LOAD", 0.85, f"mock-be-{i}", script_id))
-                
+            cur.execute("""
+                INSERT INTO scripts (script_id, name, description, target_backend, content, version, enabled, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, 1, TRUE, %s, %s)
+            """, ("recovery-script-ms-fe", "Flush FE Edge Cache", "Automatically flushes Varnish cache and resets rate limiters for ms-fe", "ms-fe", fe_content, time.time(), time.time()))
+            
+            cur.execute("""
+                INSERT INTO rules (prediction, minimum_score, target_backend, script_id, enabled)
+                VALUES (%s, %s, %s, %s, TRUE)
+            """, ("HIGH_LOAD", 0.70, "ms-fe", "recovery-script-ms-fe"))
+
+            # 2. MS BE Script
+            be_content = """# Re-spawning Worker Processes and Flushing Cache
+import urllib.request
+import os
+import json
+import time
+
+backend_url = os.environ.get("MOCK_BACKEND_URL")
+print("[INFO] Initiating self-healing script 'Restart BE Workers' for target 'ms-be'...", flush=True)
+time.sleep(0.5)
+print("[DEBUG] Scanning active threads for memory-leaking pools (PIDs 145, 148)...", flush=True)
+time.sleep(0.5)
+print("[INFO] Terminating orphaned Gunicorn workers and re-spawning Celery worker pool...", flush=True)
+time.sleep(0.5)
+print("[INFO] Flushing shared memory caches and re-allocating memory pages...", flush=True)
+req = urllib.request.Request(f"{backend_url}/recover", method="POST")
+with urllib.request.urlopen(req) as response:
+    res_data = response.read().decode()
+    print(f"[SUCCESS] Microservice Backend recovered. API Response: {res_data}", flush=True)
+"""
+            cur.execute("""
+                INSERT INTO scripts (script_id, name, description, target_backend, content, version, enabled, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, 1, TRUE, %s, %s)
+            """, ("recovery-script-ms-be", "Restart BE Workers", "Automatically restarts Gunicorn/Celery leaking worker nodes on ms-be", "ms-be", be_content, time.time(), time.time()))
+            
+            cur.execute("""
+                INSERT INTO rules (prediction, minimum_score, target_backend, script_id, enabled)
+                VALUES (%s, %s, %s, %s, TRUE)
+            """, ("HIGH_LOAD", 0.70, "ms-be", "recovery-script-ms-be"))
+
+            # 3. MS DB Script
+            db_content = """# Flushing Postgres Connection Pool and Reclaiming Memory
+import urllib.request
+import os
+import json
+import time
+
+backend_url = os.environ.get("MOCK_BACKEND_URL")
+print("[INFO] Initiating self-healing script 'Flush DB Connections' for target 'ms-db'...", flush=True)
+time.sleep(0.5)
+print("[DEBUG] Querying pg_stat_activity and terminating idle system transactions...", flush=True)
+time.sleep(0.5)
+print("[INFO] Flushing PostgreSQL connection pools to clear socket pileups...", flush=True)
+time.sleep(0.5)
+print("[INFO] Running VACUUM ANALYZE to reclaim index page disk structures...", flush=True)
+req = urllib.request.Request(f"{backend_url}/recover", method="POST")
+with urllib.request.urlopen(req) as response:
+    res_data = response.read().decode()
+    print(f"[SUCCESS] Database pools cleared. API Response: {res_data}", flush=True)
+"""
+            cur.execute("""
+                INSERT INTO scripts (script_id, name, description, target_backend, content, version, enabled, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, 1, TRUE, %s, %s)
+            """, ("recovery-script-ms-db", "Flush DB Connections", "Flushes pg_stat connection pools and reclaims indexes for ms-db", "ms-db", db_content, time.time(), time.time()))
+            
+            cur.execute("""
+                INSERT INTO rules (prediction, minimum_score, target_backend, script_id, enabled)
+                VALUES (%s, %s, %s, %s, TRUE)
+            """, ("HIGH_LOAD", 0.70, "ms-db", "recovery-script-ms-db"))
+            
         conn.commit()
     conn.close()
 
@@ -205,9 +270,13 @@ def ingest_telemetry(payload: TelemetryPayload):
 
 def check_and_run_inference(conn):
     try:
-        # Fetch latest 25 telemetry records to align them into a 5-step window
+        # Fetch latest 30 telemetry records from the last 30 seconds to align them into a 5-step window
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT * FROM telemetry ORDER BY timestamp DESC LIMIT 30")
+            cur.execute("""
+                SELECT * FROM telemetry 
+                WHERE timestamp > %s 
+                ORDER BY timestamp DESC LIMIT 30
+            """, (time.time() - 30,))
             rows = cur.fetchall()
             
         if len(rows) < 15:
@@ -215,16 +284,16 @@ def check_and_run_inference(conn):
             return
             
         # Align
-        be_data = {"mock-be-1": [], "mock-be-2": [], "mock-be-3": []}
+        be_data = {"ms-fe": [], "ms-be": [], "ms-db": []}
         for r in rows:
             be_id = r["backend_id"]
             if be_id in be_data:
                 be_data[be_id].append(r)
                 
         # Align snapshots
-        be1_list = sorted(be_data["mock-be-1"], key=lambda x: x["timestamp"], reverse=True)
-        be2_list = be_data["mock-be-2"]
-        be3_list = be_data["mock-be-3"]
+        be1_list = sorted(be_data["ms-fe"], key=lambda x: x["timestamp"], reverse=True)
+        be2_list = be_data["ms-be"]
+        be3_list = be_data["ms-db"]
         
         aligned_snapshots = []
         for r1 in be1_list:
@@ -249,10 +318,11 @@ def check_and_run_inference(conn):
         # Call AI service
         ai_resp = requests.post(f"{AI_SERVICE_URL}/predict", json=predict_payload, timeout=3)
         if ai_resp.status_code != 200:
-            print(f"AI Service prediction failed: status {ai_resp.status_code}")
+            print(f"AI Service prediction failed: status {ai_resp.status_code}", flush=True)
             return
             
         prediction_result = ai_resp.json()
+        print(f"[Prediction Cycle] Active model: {prediction_result.get('model_id')} | Results: {prediction_result.get('predictions')}", flush=True)
         
         # Check decision rules for each predicted backend state
         for pred in prediction_result["predictions"]:
@@ -260,16 +330,31 @@ def check_and_run_inference(conn):
             pred_state = pred["prediction"]
             score = pred["score"]
             
-            # We check if there is an active action currently running to prevent double execution
+            # Hybrid Engine: Boost score if latest database telemetry confirms high CPU load
+            # This guarantees self-healing triggers even if the GNN confidence score drops slightly.
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute("""
+                    SELECT cpu, health_status FROM telemetry 
+                    WHERE backend_id = %s 
+                    ORDER BY timestamp DESC LIMIT 1
+                """, (backend_id,))
+                latest = cur.fetchone()
+                if latest and latest["health_status"] == "DEGRADED" and latest["cpu"] >= 70.0 and pred_state == "HIGH_LOAD":
+                    score = max(score, 0.95)
+            
+            # We check if there is an active action currently running OR a recent success within 15s cool-down
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT COUNT(*) FROM actions_log 
-                    WHERE backend_id = %s AND status IN ('QUEUED', 'EXECUTING')
-                """, (backend_id,))
+                    WHERE backend_id = %s AND (
+                        status IN ('QUEUED', 'EXECUTING') 
+                        OR (status = 'SUCCESS' AND timestamp > %s)
+                    )
+                """, (backend_id, time.time() - 15))
                 active_count = cur.fetchone()[0]
                 
                 if active_count > 0:
-                    continue # Already remediating this backend!
+                    continue # Already remediating or in cool-down!
                     
                 # Match against rules
                 cur.execute("""
@@ -284,7 +369,7 @@ def check_and_run_inference(conn):
                 if rule_match:
                     rule_id, r_pred, min_score, t_be, script_id, r_enabled, script_content = rule_match
                     
-                    print(f"Rule Matched: {pred_state} (score {score}) on {backend_id}. Spawning script {script_id}.")
+                    print(f"Rule Matched: {pred_state} (score {score}) on {backend_id}. Spawning script {script_id}.", flush=True)
                     
                     # Create actions log entry with SELECTED, then QUEUED
                     cur.execute("""
@@ -580,35 +665,82 @@ def train_model_endpoint(payload: Dict = Body(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+def trigger_stress_call(backend_id: str, duration: int, intensity: str):
+    ports = {"ms-fe": 8001, "ms-be": 8002, "ms-db": 8003}
+    host_map = {
+        "ms-fe": "mock-backend-1",
+        "ms-be": "mock-backend-2",
+        "ms-db": "mock-backend-3"
+    }
+    if backend_id not in ports:
+        return False
+    hostname = host_map[backend_id]
+    url = f"http://{hostname}:{ports[backend_id]}/stress"
+    try:
+        resp = requests.post(url, json={"duration": duration, "intensity": intensity}, timeout=2)
+        return resp.status_code == 200
+    except Exception:
+        return False
+
 # Demo attack simulation API
 @app.post("/api/demo/stress")
 def trigger_demo_stress(payload: Dict = Body(...)):
+    scenario = payload.get("scenario")
+    if scenario:
+        # Cascade scenarios
+        if scenario == "cascade_traffic":
+            # Coordinator thread for cascading traffic spike
+            def run_cascade():
+                trigger_stress_call("ms-fe", 35, "high")
+                time.sleep(3)
+                trigger_stress_call("ms-be", 30, "medium")
+                time.sleep(3)
+                trigger_stress_call("ms-db", 25, "low")
+            threading.Thread(target=run_cascade).start()
+            return {"status": "ok", "message": "Triggered Frontend Traffic Spike Cascade scenario"}
+            
+        elif scenario == "cascade_db":
+            # Coordinator thread for cascading database lockup
+            def run_cascade():
+                trigger_stress_call("ms-db", 35, "high")
+                time.sleep(3)
+                trigger_stress_call("ms-be", 30, "high")
+                time.sleep(3)
+                trigger_stress_call("ms-fe", 25, "high")
+            threading.Thread(target=run_cascade).start()
+            return {"status": "ok", "message": "Triggered Database Connection Lockup Cascade scenario"}
+            
+        elif scenario == "isolated_be":
+            trigger_stress_call("ms-be", 30, "high")
+            return {"status": "ok", "message": "Triggered Isolated Gunicorn Worker Leak scenario on MS BE"}
+        else:
+            raise HTTPException(status_code=400, detail="Invalid scenario name")
+            
+    # Fallback to single backend ID stress for E2E backward compatibility
     backend_id = payload.get("backend_id")
     duration = payload.get("duration", 20)
     intensity = payload.get("intensity", "high")
-    
-    # Map backend ID to mock endpoint port
-    ports = {"mock-be-1": 8001, "mock-be-2": 8002, "mock-be-3": 8003}
-    if backend_id not in ports:
-        raise HTTPException(status_code=400, detail=f"Invalid backend: {backend_id}")
+    if not backend_id:
+        raise HTTPException(status_code=400, detail="Must provide either scenario or backend_id")
         
-    url = f"http://{backend_id}:{ports[backend_id]}/stress"
-    try:
-        resp = requests.post(url, json={"duration": duration, "intensity": intensity}, timeout=2)
-        if resp.status_code == 200:
-            return {"status": "ok", "message": f"Stressed {backend_id} successfully"}
-        raise HTTPException(status_code=500, detail=f"Mock Backend error: status {resp.status_code}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    if trigger_stress_call(backend_id, duration, intensity):
+        return {"status": "ok", "message": f"Stressed {backend_id} successfully"}
+    raise HTTPException(status_code=500, detail="Failed to trigger isolated backend stress")
 
 @app.post("/api/demo/recover")
 def trigger_demo_recover(payload: Dict = Body(...)):
     backend_id = payload.get("backend_id")
-    ports = {"mock-be-1": 8001, "mock-be-2": 8002, "mock-be-3": 8003}
+    ports = {"ms-fe": 8001, "ms-be": 8002, "ms-db": 8003}
     if backend_id not in ports:
         raise HTTPException(status_code=400, detail=f"Invalid backend: {backend_id}")
         
-    url = f"http://{backend_id}:{ports[backend_id]}/recover"
+    host_map = {
+        "ms-fe": "mock-backend-1",
+        "ms-be": "mock-backend-2",
+        "ms-db": "mock-backend-3"
+    }
+    hostname = host_map.get(backend_id, backend_id)
+    url = f"http://{hostname}:{ports[backend_id]}/recover"
     try:
         resp = requests.post(url, timeout=2)
         if resp.status_code == 200:

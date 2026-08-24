@@ -37,9 +37,9 @@ class GNNModel(nn.Module):
         # D_tilde = diag(3, 3, 3)
         # D_tilde^{-1/2} A_tilde D_tilde^{-1/2} = A_tilde / 3
         adj = torch.tensor([
-            [1.0, 1.0, 1.0],
-            [1.0, 1.0, 1.0],
-            [1.0, 1.0, 1.0]
+            [4.0, 1.0, 1.0],
+            [1.0, 4.0, 1.0],
+            [1.0, 1.0, 4.0]
         ], dtype=torch.float32)
         # Normalize: D^{-1/2} A D^{-1/2}
         deg = adj.sum(dim=1)

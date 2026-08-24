@@ -122,17 +122,17 @@ def bootstrap_telemetry(conn):
     if there are fewer than 100 entries.
     """
     with conn.cursor() as cur:
-        cur.execute("SELECT COUNT(*) FROM telemetry")
+        cur.execute("SELECT COUNT(*) FROM telemetry WHERE health_status = 'DEGRADED'")
         count = cur.fetchone()[0]
-        if count >= 100:
-            print(f"Database already has {count} telemetry records. Skipping bootstrap.")
+        if count >= 30:
+            print(f"Database already has {count} degraded telemetry records. Skipping bootstrap.")
             return
 
         print("Bootstrapping synthetic telemetry for training...")
         
         # We generate 200 timestamps (1 second apart)
         start_time = time.time() - 3600 # 1 hour ago
-        backends = ["mock-be-1", "mock-be-2", "mock-be-3"]
+        backends = ["ms-fe", "ms-be", "ms-db"]
         
         # State helper to generate realistic numbers
         def gen_metrics(state_name):
@@ -215,7 +215,7 @@ def load_and_align_data(conn, window_size=5):
         rows = cur.fetchall()
 
     # Separate by backend
-    be_data = {"mock-be-1": [], "mock-be-2": [], "mock-be-3": []}
+    be_data = {"ms-fe": [], "ms-be": [], "ms-db": []}
     for row in rows:
         be_id = row["backend_id"]
         if be_id in be_data:
@@ -223,9 +223,9 @@ def load_and_align_data(conn, window_size=5):
 
     # Align snapshots by matching close timestamps
     snapshots = []
-    be1_list = be_data["mock-be-1"]
-    be2_list = be_data["mock-be-2"]
-    be3_list = be_data["mock-be-3"]
+    be1_list = be_data["ms-fe"]
+    be2_list = be_data["ms-be"]
+    be3_list = be_data["ms-db"]
     
     # We loop through be1 and find closest in be2 and be3 within 2 seconds
     for r1 in be1_list:

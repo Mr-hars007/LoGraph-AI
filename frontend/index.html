@@ -18,6 +18,15 @@
         .glow-green { box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
         .glow-yellow { box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); }
         .glow-red { box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+        
+        /* Hide scrollbars but keep scrolling functional */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
     </style>
 </head>
 <body class="font-sans antialiased">
@@ -119,32 +128,12 @@
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Target Service</label>
-                        <select id="sim-target" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none focus:border-indigo-500">
-                            <option value="mock-be-1">Mock Backend 1 (BE1)</option>
-                            <option value="mock-be-2">Mock Backend 2 (BE2)</option>
-                            <option value="mock-be-3">Mock Backend 3 (BE3)</option>
+                        <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Incident Scenario</label>
+                        <select id="sim-scenario" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none focus:border-indigo-500">
+                            <option value="cascade_traffic">Frontend Traffic Spike (Cascades to BE & DB)</option>
+                            <option value="cascade_db">Database Connection Lockup (Cascades up to BE & FE)</option>
+                            <option value="isolated_be">Isolated Gunicorn Worker Leak (MS BE High Load)</option>
                         </select>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Duration</label>
-                            <select id="sim-duration" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
-                                <option value="15">15 Seconds</option>
-                                <option value="30">30 Seconds</option>
-                                <option value="45">45 Seconds</option>
-                                <option value="60">60 Seconds</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Intensity</label>
-                            <select id="sim-intensity" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
-                                <option value="low">Low (+50% CPU)</option>
-                                <option value="medium">Medium (+75% CPU)</option>
-                                <option value="high">High (+90% CPU/Lat)</option>
-                            </select>
-                        </div>
                     </div>
                     
                     <div class="grid grid-cols-2 gap-4 pt-2">
@@ -182,7 +171,7 @@
                     <i class="fa-solid fa-plus mr-1"></i> Create
                 </button>
             </div>
-            <div id="scripts-list" class="space-y-3 overflow-y-auto max-h-64 pr-2">
+            <div id="scripts-list" class="space-y-3 overflow-y-auto max-h-64 pr-2 no-scrollbar">
                 <!-- JS Filled -->
             </div>
         </div>
@@ -197,17 +186,19 @@
                     <i class="fa-solid fa-plus mr-1"></i> Create
                 </button>
             </div>
-            <div id="rules-list" class="space-y-3 overflow-y-auto max-h-64 pr-2">
+            <div id="rules-list" class="space-y-3 overflow-y-auto max-h-64 pr-2 no-scrollbar">
                 <!-- JS Filled -->
             </div>
         </div>
 
         <!-- Column 3: Action Logs Timeline -->
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
-            <h2 class="text-lg font-semibold text-slate-200 mb-4">
-                <i class="fa-solid fa-clock-rotate-left mr-2 text-indigo-500"></i> Execution Timeline
-            </h2>
-            <div id="actions-timeline" class="space-y-3 overflow-y-auto max-h-64 pr-2">
+            <div id="actions-timeline-header">
+                <h2 class="text-lg font-semibold text-slate-200 mb-4">
+                    <i class="fa-solid fa-clock-rotate-left mr-2 text-indigo-500"></i> Execution Timeline
+                </h2>
+            </div>
+            <div id="actions-timeline" class="space-y-3 overflow-y-auto max-h-64 pr-2 no-scrollbar">
                 <!-- JS Filled -->
             </div>
         </div>
@@ -236,9 +227,9 @@
                     <div>
                         <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Target Backend</label>
                         <select id="script-backend" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
-                            <option value="mock-be-1">Mock Backend 1</option>
-                            <option value="mock-be-2">Mock Backend 2</option>
-                            <option value="mock-be-3">Mock Backend 3</option>
+                            <option value="ms-fe">MS FE (Frontend)</option>
+                            <option value="ms-be">MS BE (Backend)</option>
+                            <option value="ms-db">MS DB (Database)</option>
                         </select>
                     </div>
                     <div class="flex items-center pt-5">
@@ -283,9 +274,9 @@
                 <div>
                     <label class="text-xs font-semibold text-slate-400 uppercase block mb-1">Target Backend</label>
                     <select id="rule-backend" onchange="updateRuleScriptOptions()" class="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-300 focus:outline-none">
-                        <option value="mock-be-1">Mock Backend 1</option>
-                        <option value="mock-be-2">Mock Backend 2</option>
-                        <option value="mock-be-3">Mock Backend 3</option>
+                        <option value="ms-fe">MS FE (Frontend)</option>
+                        <option value="ms-be">MS BE (Backend)</option>
+                        <option value="ms-db">MS DB (Database)</option>
                     </select>
                 </div>
                 <div>
@@ -345,6 +336,8 @@
         let latestTelemetry = [];
         let telemetryHistory = [];
         let currentModels = [];
+        let selectedNodeId = null;
+        let latestActions = [];
         
         // Chart configuration
         let chartInstance = null;
@@ -355,15 +348,49 @@
         
         // Define node positions
         const nodes = {
-            "mock-be-1": { x: 170, y: 60, name: "BE1", color: "#22c55e", state: "NORMAL", score: 0.95 },
-            "mock-be-2": { x: 270, y: 190, name: "BE2", color: "#22c55e", state: "NORMAL", score: 0.95 },
-            "mock-be-3": { x: 70, y: 190, name: "BE3", color: "#22c55e", state: "NORMAL", score: 0.95 }
+            "ms-fe": { x: 170, y: 60, name: "MS FE", color: "#22c55e", state: "NORMAL", score: 0.95 },
+            "ms-be": { x: 270, y: 190, name: "MS BE", color: "#22c55e", state: "NORMAL", score: 0.95 },
+            "ms-db": { x: 70, y: 190, name: "MS DB", color: "#22c55e", state: "NORMAL", score: 0.95 }
         };
+
+        // Smooth animation frame loop for the canvas
+        function animateLoop() {
+            drawGraph();
+            requestAnimationFrame(animateLoop);
+        }
 
         // Initialize dashboard
         window.addEventListener("DOMContentLoaded", () => {
             initChart();
-            drawGraph();
+            requestAnimationFrame(animateLoop);
+            
+            // Add click listener on graph canvas for timeline linking
+            canvas.addEventListener("click", (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clickX = ((e.clientX - rect.left) / rect.width) * canvas.width;
+                const clickY = ((e.clientY - rect.top) / rect.height) * canvas.height;
+                
+                let clickedNode = null;
+                Object.keys(nodes).forEach(key => {
+                    const node = nodes[key];
+                    const dist = Math.sqrt((clickX - node.x) ** 2 + (clickY - node.y) ** 2);
+                    if (dist <= 30) {
+                        clickedNode = key;
+                    }
+                });
+                
+                if (clickedNode) {
+                    if (selectedNodeId === clickedNode) {
+                        selectedNodeId = null; // Toggle off
+                    } else {
+                        selectedNodeId = clickedNode; // Toggle on
+                    }
+                } else {
+                    selectedNodeId = null; // Clear
+                }
+                
+                updateActionsTimeline(latestActions);
+            });
             
             // Poll data
             fetchData();
@@ -547,9 +574,6 @@
             }
             
             // Draw edges
-            ctx.strokeStyle = "#4f46e5";
-            ctx.lineWidth = 3;
-            
             const nodeKeys = Object.keys(nodes);
             
             // Draw edges in cyclic triangle loop
@@ -557,23 +581,77 @@
                 const n1 = nodes[nodeKeys[i]];
                 const n2 = nodes[nodeKeys[(i + 1) % nodeKeys.length]];
                 
+                // Realtime edge coloring reflecting connection health states
+                let edgeColor = "#1e293b"; // Dark slate default
+                let lineWidth = 2;
+                
+                if (n1.state === "HIGH_LOAD" || n2.state === "HIGH_LOAD") {
+                    edgeColor = "rgba(239, 68, 68, 0.4)"; // translucent red
+                    lineWidth = 3;
+                } else if (n1.state === "DEGRADED" || n2.state === "DEGRADED") {
+                    edgeColor = "rgba(234, 179, 8, 0.4)"; // translucent yellow
+                    lineWidth = 2.5;
+                }
+                
+                ctx.strokeStyle = edgeColor;
+                ctx.lineWidth = lineWidth;
+                
                 ctx.beginPath();
                 ctx.moveTo(n1.x, n1.y);
                 ctx.lineTo(n2.x, n2.y);
                 ctx.stroke();
+
+                // Draw moving laser light along the line - dot color matches target node state
+                const speed = 0.0008;
+                const progress = (Date.now() * speed) % 1.0;
+                const dotX = n1.x + (n2.x - n1.x) * progress;
+                const dotY = n1.y + (n2.y - n1.y) * progress;
+                
+                ctx.beginPath();
+                ctx.arc(dotX, dotY, 4.5, 0, 2 * Math.PI);
+                ctx.fillStyle = n2.color; // real-time laser color matching target service state!
+                ctx.fill();
             }
             
             // Draw nodes
             nodeKeys.forEach(key => {
                 const node = nodes[key];
                 
+                // Calculate dynamic pulse radius if stressed
+                let baseRadius = 25;
+                let strokeWidth = 3;
+                if (node.state === "HIGH_LOAD") {
+                    baseRadius = 25 + 5 * Math.sin(Date.now() / 120);
+                    strokeWidth = 4;
+                    // Draw outer warning pulse
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, baseRadius + 10, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(239, 68, 68, 0.25)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                } else if (node.state === "DEGRADED") {
+                    baseRadius = 25 + 2.5 * Math.sin(Date.now() / 200);
+                    strokeWidth = 3.5;
+                }
+
+                // Draw selected border if clicked
+                if (selectedNodeId === key) {
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, baseRadius + 7, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "#22d3ee"; // cyan
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([4, 4]); // dashed ring
+                    ctx.stroke();
+                    ctx.setLineDash([]); // reset
+                }
+
                 // Draw Outer glow
                 ctx.beginPath();
-                ctx.arc(node.x, node.y, 25, 0, 2 * Math.PI);
-                ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+                ctx.arc(node.x, node.y, baseRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = "rgba(15, 23, 42, 0.95)";
                 ctx.fill();
                 
-                ctx.lineWidth = 4;
+                ctx.lineWidth = strokeWidth;
                 ctx.strokeStyle = node.color;
                 ctx.stroke();
                 
@@ -588,6 +666,26 @@
                 ctx.font = "bold 11px sans-serif";
                 ctx.textAlign = "center";
                 ctx.fillText(node.name, node.x, node.y - 32);
+                
+                // Realtime Incident status tag above node (Requirement)
+                let incidentText = "";
+                let incidentColor = "";
+                const activeAct = latestActions.find(a => a.backend_id === key && (a.status === "QUEUED" || a.status === "EXECUTING"));
+                const recentSuccess = latestActions.find(a => a.backend_id === key && a.status === "SUCCESS" && (Date.now() / 1000 - a.timestamp) < 15);
+                
+                if (activeAct) {
+                    incidentText = "REMEDYING";
+                    incidentColor = "#eab308"; // yellow
+                } else if (recentSuccess) {
+                    incidentText = "RECOVERED";
+                    incidentColor = "#22c55e"; // green
+                }
+                
+                if (incidentText) {
+                    ctx.fillStyle = incidentColor;
+                    ctx.font = "bold 8px monospace";
+                    ctx.fillText(`[${incidentText}]`, node.x, node.y - 43);
+                }
                 
                 // State text below node
                 ctx.fillStyle = node.color;
@@ -604,7 +702,7 @@
                     labels: [],
                     datasets: [
                         {
-                            label: "BE1 CPU (%)",
+                            label: "MS FE CPU (%)",
                             borderColor: "#ef4444",
                             backgroundColor: "rgba(239, 68, 68, 0.1)",
                             data: [],
@@ -613,7 +711,7 @@
                             pointRadius: 0
                         },
                         {
-                            label: "BE2 CPU (%)",
+                            label: "MS BE CPU (%)",
                             borderColor: "#eab308",
                             backgroundColor: "rgba(234, 179, 8, 0.1)",
                             data: [],
@@ -622,7 +720,7 @@
                             pointRadius: 0
                         },
                         {
-                            label: "BE3 CPU (%)",
+                            label: "MS DB CPU (%)",
                             borderColor: "#22c55e",
                             backgroundColor: "rgba(34, 197, 94, 0.1)",
                             data: [],
@@ -674,9 +772,9 @@
             const be3_data = [];
             
             timeLabels.forEach(t => {
-                be1_data.push(groups[t]["mock-be-1"] || null);
-                be2_data.push(groups[t]["mock-be-2"] || null);
-                be3_data.push(groups[t]["mock-be-3"] || null);
+                be1_data.push(groups[t]["ms-fe"] || null);
+                be2_data.push(groups[t]["ms-be"] || null);
+                be3_data.push(groups[t]["ms-db"] || null);
             });
             
             chartInstance.data.labels = timeLabels.map(t => new Date(t * 1000).toLocaleTimeString());
@@ -710,15 +808,46 @@
         }
 
         function updateActionsTimeline(actions) {
+            latestActions = actions || [];
+            
+            // Dynamic timeline header status
+            const timelineHeader = document.getElementById("actions-timeline-header");
+            if (timelineHeader) {
+                if (selectedNodeId) {
+                    timelineHeader.innerHTML = `
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-slate-200">
+                                <i class="fa-solid fa-clock-rotate-left mr-2 text-indigo-500"></i> Execution Timeline
+                            </h2>
+                            <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-cyan-400 px-2 py-0.5 rounded-full flex items-center space-x-1 font-mono">
+                                <span>${selectedNodeId.toUpperCase()} FILTER</span>
+                                <button onclick="selectedNodeId=null; drawGraph(); updateActionsTimeline(latestActions);" class="hover:text-cyan-200 ml-1 font-bold">×</button>
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    timelineHeader.innerHTML = `
+                        <h2 class="text-lg font-semibold text-slate-200 mb-4">
+                            <i class="fa-solid fa-clock-rotate-left mr-2 text-indigo-500"></i> Execution Timeline
+                        </h2>
+                    `;
+                }
+            }
+
             const container = document.getElementById("actions-timeline");
             container.innerHTML = "";
             
-            if (actions.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 italic p-4 text-center">No remediation actions executed yet.</p>`;
+            let filteredActions = latestActions;
+            if (selectedNodeId) {
+                filteredActions = latestActions.filter(act => act.backend_id === selectedNodeId);
+            }
+            
+            if (filteredActions.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 italic p-4 text-center">No remediation actions executed ${selectedNodeId ? 'for this node ' : ''}yet.</p>`;
                 return;
             }
             
-            actions.forEach(act => {
+            filteredActions.forEach(act => {
                 let statusColor = "text-slate-400 bg-slate-800";
                 if (act.status === "SUCCESS") statusColor = "text-green-400 bg-green-950/40 border-green-900";
                 else if (act.status === "FAILED") statusColor = "text-red-400 bg-red-950/40 border-red-900";
@@ -727,8 +856,8 @@
                 
                 const timeString = new Date(act.timestamp * 1000).toLocaleTimeString();
                 
-                const outSection = act.output ? `<pre class="mt-1.5 p-1.5 bg-black/60 rounded text-[10px] text-green-400 font-mono overflow-x-auto max-h-16">${act.output}</pre>` : "";
-                const errSection = act.error ? `<pre class="mt-1.5 p-1.5 bg-red-950/40 rounded text-[10px] text-red-400 font-mono overflow-x-auto max-h-16">${act.error}</pre>` : "";
+                const outSection = act.output ? `<pre class="mt-1.5 p-1.5 bg-black/60 rounded text-[10px] text-green-400 font-mono overflow-x-auto max-h-16 no-scrollbar">${act.output}</pre>` : "";
+                const errSection = act.error ? `<pre class="mt-1.5 p-1.5 bg-red-950/40 rounded text-[10px] text-red-400 font-mono overflow-x-auto max-h-16 no-scrollbar">${act.error}</pre>` : "";
 
                 const row = `
                     <div class="p-3 bg-slate-950 border border-slate-900 rounded-lg text-xs space-y-1.5">
@@ -741,7 +870,7 @@
                             <span>Time: ${timeString}</span>
                         </div>
                         <div class="flex justify-between text-[10px] text-slate-500 border-t border-slate-900 pt-1">
-                            <span>Trigger: <b>${act.prediction} (${(act.score * 100).toFixed(0)}%)</b></span>
+                            <span>Trigger: <b>${act.prediction} (${act.score ? (act.score * 100).toFixed(0) : 0}%)</b></span>
                         </div>
                         ${outSection}
                         ${errSection}
@@ -800,30 +929,28 @@
 
         // Demo Actions
         function startSimulation() {
-            const backend_id = document.getElementById("sim-target").value;
-            const duration = parseInt(document.getElementById("sim-duration").value);
-            const intensity = document.getElementById("sim-intensity").value;
+            const scenario = document.getElementById("sim-scenario").value;
             
             fetch("/api/demo/stress", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ backend_id, duration, intensity })
+                body: JSON.stringify({ scenario })
             })
             .then(res => res.json())
-            .then(data => alert(`Stressed ${backend_id} (${intensity}) successfully.`))
-            .catch(err => alert("Failed to trigger stress: " + err));
+            .then(data => alert(data.message || "Simulation scenario triggered successfully!"))
+            .catch(err => alert("Failed to trigger simulation scenario: " + err));
         }
 
         function stopSimulation() {
-            const backend_id = document.getElementById("sim-target").value;
-            fetch("/api/demo/recover", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ backend_id })
-            })
-            .then(res => res.json())
-            .then(data => alert(`Triggered recovery request for ${backend_id}`))
-            .catch(err => alert("Failed to recover: " + err));
+            const backends = ["ms-fe", "ms-be", "ms-db"];
+            backends.forEach(be => {
+                fetch("/api/demo/recover", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ backend_id: be })
+                }).catch(err => console.error("Failed to recover: " + be, err));
+            });
+            alert("Sent recovery signals to all microservices.");
         }
 
         // Modal triggers

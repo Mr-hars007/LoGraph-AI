@@ -150,7 +150,7 @@ def predict(req: PredictRequest):
     # Input shape needed: [1, 3, 5, 7]
     try:
         # Align nodes: make sure node 0 is mock-be-1, node 1 is mock-be-2, node 2 is mock-be-3
-        node_order = ["mock-be-1", "mock-be-2", "mock-be-3"]
+        node_order = ["ms-fe", "ms-be", "ms-db"]
         
         sample_x = [] # [3, 5, 7]
         for node_id in node_order:

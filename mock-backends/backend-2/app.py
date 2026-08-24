@@ -2,12 +2,13 @@ import time
 import random
 import uvicorn
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-app = FastAPI(title="Mock Backend 2")
+app = FastAPI(title="Microservice Backend (MS BE)")
 
 # Backend state
-backend_id = "mock-be-2"
+backend_id = "ms-be"
 port = 8002
 
 # Telemetry state
@@ -28,16 +29,10 @@ class StressRequest(BaseModel):
     duration: int
     intensity: str
 
-@app.get("/health")
-def health():
-    return {"status": "ok", "backend_id": backend_id}
-
-@app.get("/metrics")
-def get_metrics():
+def update_state():
     now = time.time()
     is_stressed = now < state["stress_until"]
     
-    # Calculate telemetry dynamically with realistic noise
     if is_stressed:
         intensity = state["stress_intensity"]
         if intensity == "high":
@@ -68,7 +63,6 @@ def get_metrics():
             queue_target = random.uniform(1.0, 3.0)
             health = "NORMAL"
     else:
-        # Normal workload oscillations
         cpu_target = random.uniform(20.0, 40.0)
         mem_target = random.uniform(30.0, 50.0)
         latency_target = random.uniform(20.0, 80.0)
@@ -87,9 +81,76 @@ def get_metrics():
     state["queue_depth"] = int(queue_target)
     state["health_status"] = health
 
+@app.get("/", response_class=HTMLResponse)
+def get_home_page():
+    update_state()
+    now_stressed = time.time() < state["stress_until"]
+    status_color = "text-red-500" if now_stressed else "text-green-500"
+    status_bg = "bg-red-950/20 border-red-900" if now_stressed else "bg-green-950/20 border-green-900"
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>MS BE - Microservice Backend API Page</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-slate-950 text-slate-100 font-sans p-8 flex items-center justify-center min-h-screen">
+        <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-2xl space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-600 p-2.5 rounded text-white font-bold">BE</div>
+                    <div>
+                        <h1 class="text-lg font-bold">Microservice BE</h1>
+                        <p class="text-xs text-slate-400">REST API & Business Logic Server</p>
+                    </div>
+                </div>
+                <span class="px-2.5 py-1 rounded text-xs font-mono font-bold border {status_bg} {status_color}">
+                    {state["health_status"]}
+                </span>
+            </div>
+            
+            <div class="space-y-3">
+                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider">Live System Resource Status</h2>
+                <div class="grid grid-cols-2 gap-4 text-sm font-mono">
+                    <div class="bg-slate-950 p-3 rounded border border-slate-800">
+                        <span class="text-xs text-slate-500 block">CPU LOAD</span>
+                        <span class="text-lg font-bold text-slate-200">{state["cpu"]}%</span>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded border border-slate-800">
+                        <span class="text-xs text-slate-500 block">MEMORY</span>
+                        <span class="text-lg font-bold text-slate-200">{state["memory"]}%</span>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded border border-slate-800">
+                        <span class="text-xs text-slate-500 block">REQUEST RATE</span>
+                        <span class="text-lg font-bold text-slate-200">{state["request_rate"]} req/s</span>
+                    </div>
+                    <div class="bg-slate-950 p-3 rounded border border-slate-800">
+                        <span class="text-xs text-slate-500 block">LATENCY</span>
+                        <span class="text-lg font-bold text-slate-200">{state["latency"]} ms</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-xs text-slate-500 text-center border-t border-slate-800 pt-4">
+                System is monitored by Logoph Guard & Control Agent (LGCA-2)
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return html_content
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "backend_id": backend_id}
+
+@app.get("/metrics")
+def get_metrics():
+    update_state()
     return {
         "backend_id": backend_id,
-        "timestamp": now,
+        "timestamp": time.time(),
         "cpu": state["cpu"],
         "memory": state["memory"],
         "request_rate": state["request_rate"],

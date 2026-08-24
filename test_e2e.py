@@ -5,9 +5,9 @@ import requests
 BACKEND_URL = "http://localhost:8000"
 AI_URL = "http://localhost:8004"
 MOCK_BE_URLS = {
-    "mock-be-1": "http://localhost:8001",
-    "mock-be-2": "http://localhost:8002",
-    "mock-be-3": "http://localhost:8003"
+    "ms-fe": "http://localhost:8001",
+    "ms-be": "http://localhost:8002",
+    "ms-db": "http://localhost:8003"
 }
 
 def log(msg):
@@ -59,7 +59,7 @@ def verify_health():
 def trigger_and_wait_training():
     log("Triggering GNN model training pipeline...")
     try:
-        r = requests.post(f"{BACKEND_URL}/api/train", json={"model_type": "gnn", "epochs": 20}, timeout=5)
+        r = requests.post(f"{BACKEND_URL}/api/train", json={"model_type": "gnn", "epochs": 50}, timeout=5)
         if r.status_code != 200:
             error(f"Failed to trigger training: {r.text}")
             return False
@@ -104,7 +104,7 @@ def verify_rules():
     return False
 
 def run_incident_loop():
-    target_backend = "mock-be-2"
+    target_backend = "ms-be"
     log(f"Step 1: Straining backend {target_backend} to trigger incident...")
     
     try:

@@ -63,7 +63,7 @@ services:
     build: ./lgca
     container_name: lgca-1
     environment:
-      - BACKEND_ID=mock-be-1
+      - BACKEND_ID=ms-fe
       - MOCK_BACKEND_URL=http://mock-backend-1:8001
       - CENTRAL_BACKEND_URL=http://backend:8000
       - SANDBOX_URL=http://script-sandbox:8005
@@ -83,7 +83,7 @@ services:
     build: ./lgca
     container_name: lgca-2
     environment:
-      - BACKEND_ID=mock-be-2
+      - BACKEND_ID=ms-be
       - MOCK_BACKEND_URL=http://mock-backend-2:8002
       - CENTRAL_BACKEND_URL=http://backend:8000
       - SANDBOX_URL=http://script-sandbox:8005
@@ -103,7 +103,7 @@ services:
     build: ./lgca
     container_name: lgca-3
     environment:
-      - BACKEND_ID=mock-be-3
+      - BACKEND_ID=ms-db
       - MOCK_BACKEND_URL=http://mock-backend-3:8003
       - CENTRAL_BACKEND_URL=http://backend:8000
       - SANDBOX_URL=http://script-sandbox:8005
